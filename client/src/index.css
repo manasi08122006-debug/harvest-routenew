@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #FAF7F2;
+  color: #2A1E15;
+}
+
+.hero-pattern {
+  background-color: #153329;
+  background-image: radial-gradient(#2B7059 1px, transparent 1px), radial-gradient(#2B7059 1px, #153329 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}

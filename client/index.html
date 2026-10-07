@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harvest Route — Redundant Local Produce Network</title>
+  
+  <!-- Google Fonts: Playfair Display for Earthy Serif Headings, Inter for Clean Body Text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            earth: {
+              50: '#FBF9F5',
+              100: '#F5EFEB',
+              200: '#EAE0D5',
+              300: '#D5C3B0',
+              400: '#B89F84',
+              500: '#8E6F52',
+              600: '#6F543C',
+              700: '#543F2D',
+              800: '#3D2D20',
+              900: '#2A1E15',
+            },
+            forest: {
+              50: '#F0F7F4',
+              100: '#DDEFE7',
+              200: '#BCDED0',
+              300: '#90C7B2',
+              400: '#5EAA8F',
+              500: '#398C70',
+              600: '#2B7059',
+              700: '#235A48',
+              800: '#1C4537',
+              900: '#153329',
+              950: '#0C1F19',
+            },
+            harvest: {
+              50: '#FFFBEB',
+              100: '#FEF3C7',
+              200: '#FDE68A',
+              300: '#FCD34D',
+              400: '#FBBF24',
+              500: '#E09F3E',
+              600: '#C77D22',
+              700: '#A15E17',
+              800: '#854D16',
+              900: '#713F12',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18, React DOM, Babel for in-browser execution -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #2A1E15;
+    }
+    .hero-pattern {
+      background-color: #153329;
+      background-image: radial-gradient(#2B7059 1px, transparent 1px), radial-gradient(#2B7059 1px, #153329 1px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #F5EFEB;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #B89F84;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-harvest-200 selection:text-forest-900">
+  <div id="root"></div>
+
+  <!-- Main Application Script -->
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // --- MULTILINGUAL TRANSLATION DATA (EN, HI, MR) WITHOUT EMOJIS ---
+    const TRANSLATIONS = {
+      en: {
+        nav: {
+          home: "Home",
+          howItWorks: "How It Works",
+          forFarmers: "For Farmers",
+          forRestaurants: "For Restaurants",
+          network: "The Network",
+          contact: "Contact",
+          joinFarmer: "Farmer Portal",
+          joinRestaurant: "Restaurant Portal",
+          signOut: "Sign Out",
+          signInRestaurant: "Restaurant Sign In",
+          signInFarmer: "Farmer Sign In",
+          signInTitle: "Sign In",
+          email: "Email",
+          password: "Password",
+          signInBtn: "Sign In",
+          cancel: "Cancel",
+          nameLabel: "Your Name",
+          namePlaceholder: "Enter your full name",
+          emailPlaceholder: "you@example.com",
+          passwordPlaceholder: "Enter a password",
+          demoNote: "Enter your name and details to start with a fresh account.",
+          signInError: "Please enter your name, a valid email and a password.",
+          back: "Back",
+          forward: "Forward"
+        },
+        hero: {
+          tagline: "DECENTRALIZED LOCAL PRODUCE NETWORK",
+          headline: "Fresh produce, delivered on time — from farms near your kitchen",
+          subheadline: "Instead of relying on a single, distant wholesale supplier, Harvest Route pools certified local farms into a coordinated, redundant network. Chef-grade morning freshness, zero single points of failure, guaranteed delivery.",
+          orderCTA: "Start Ordering Fresh",
+          farmerCTA: "List Your Harvest",
+          statFarms: "48+ Regional Farms",
+          statDelivery: "3.8 hr Farm-to-Kitchen",
+          statReliability: "99.4% On-Time Guarantee"
+        },
+        comparison: {
+          title: "Why Single-Supplier Chains Fail Commercial Kitchens",
+          subtitle: "Decentralized multi-farm networks eliminate supply fragility and food waste",
+          col1Title: "Single Distant Supplier",
+          col1Sub: "The Fragile Wholesale Model",
+          col1Point1: "Single farm failure halts your dinner service",
+          col1Point2: "3 to 5 days in transit, high bruising and spoilage",
+          col1Point3: "Opaque commodity pricing with heavy distributor margins",
+          col2Title: "Harvest Route Local Network",
+          col2Sub: "Decentralized Redundant Infrastructure",
+          col2Point1: "Multiple local growers provide automatic backup coverage",
+          col2Point2: "Harvested at sunrise, delivered into prep coolers before lunch",
+          col2Point3: "Transparent itemized costs and 95% net payout to growers",
+          col3Title: "The Redundancy Advantage",
+          col3Sub: "Built-In Automated Failover",
+          col3Point1: "Smart algorithm splits orders across 2 to 4 nearby farms",
+          col3Point2: "Immediate auto-reassignment if weather or shortfall occurs",
+          col3Point3: "Consolidated single vehicle drop-off at your kitchen gate"
+        },
+        steps: {
+          badge: "STREAMLINED 4-STEP FULFILLMENT",
+          title: "How It Works: Farm to Service",
+          subtitle: "One unified purchase order. Multiple resilient farms. One consolidated delivery route.",
+          s1Title: "1. Order Placed",
+          s1Desc: "Restaurant selects vegetables, quantity, and prep delivery window in the digital marketplace.",
+          s2Title: "2. Matched to Nearby Farmers",
+          s2Desc: "Our algorithm splits quantities across 2 to 4 local farms based on distance, stock, and reliability scores.",
+          s3Title: "3. Harvest Confirmed",
+          s3Desc: "Growers receive digital manifests, harvest at dawn, and tag eco-crates for pickup.",
+          s4Title: "4. Consolidated Delivery",
+          s4Desc: "A single temperature-controlled route collects from all contributing farms and delivers in one stop."
+        },
+        benefits: {
+          farmersTitle: "For Regional Farmers",
+          farmersSubtitle: "Focus on cultivating quality produce while our platform handles demand forecasting and logistics.",
+          f1: "Guaranteed steady orders from top independent restaurants and hotels",
+          f2: "Fair transparent pricing with 95% net payout disbursed directly",
+          f3: "No middlemen markups or predatory mandi broker contracts",
+          f4: "Redundancy protection: other cluster farms absorb shortfalls without lost standing",
+          restaurantsTitle: "For Kitchens & Chefs",
+          restaurantsSubtitle: "Peak seasonal quality backed by an unbreakable supply guarantee.",
+          r1: "Morning-picked freshness with maximum nutritional and culinary flavor",
+          r2: "Zero stockouts: automatic backup farm reassignment protects your menu",
+          r3: "Single consolidated invoice with itemized grower traceability",
+          r4: "Flexible standing and recurring pantry orders with 1-click replenishment"
+        },
+        trust: {
+          title: "Trusted by Commercial Kitchens & Certified Organic Growers",
+          quote: "Before Harvest Route, a transport breakdown at the central mandi meant removing seasonal dishes from our menu. Now, our order is covered across three farms in the Nashik-Pune cluster. We have had consistent on-time fulfillment for 8 months.",
+          author: "Chef Ananya Deshmukh",
+          role: "Executive Chef, The Spice Route Bistro"
+        },
+        ctaBanner: {
+          title: "Ready to Upgrade Your Kitchen's Produce Pipeline?",
+          desc: "Join regional restaurants and growers building a more resilient, fresher local food supply chain.",
+          btnRest: "Explore Restaurant Portal",
+          btnFarm: "Explore Farmer Portal"
+        }
+      },
+      hi: {
+        nav: {
+          home: "मुख्य पृष्ठ",
+          howItWorks: "यह कैसे काम करता है",
+          forFarmers: "किसानों के लिए",
+          forRestaurants: "रेस्टोरेंट के लिए",
+          network: "हमारा नेटवर्क",
+          contact: "संपर्क करें",
+          joinFarmer: "किसान पोर्टल",
+          joinRestaurant: "रेस्टोरेंट पोर्टल",
+          signOut: "लॉग आउट",
+          signInRestaurant: "रेस्टोरेंट साइन इन",
+          signInFarmer: "किसान साइन इन",
+          signInTitle: "साइन इन",
+          email: "ईमेल",
+          password: "पासवर्ड",
+          signInBtn: "साइन इन",
+          cancel: "रद्द करें",
+          nameLabel: "आपका नाम",
+          namePlaceholder: "अपना पूरा नाम लिखें",
+          emailPlaceholder: "you@example.com",
+          passwordPlaceholder: "पासवर्ड लिखें",
+          demoNote: "नया खाता शुरू करने के लिए अपना नाम और विवरण भरें।",
+          signInError: "कृपया अपना नाम, सही ईमेल और पासवर्ड दर्ज करें।",
+          back: "पीछे जाएं",
+          forward: "आगे जाएं"
+        },
+        hero: {
+          tagline: "विकेंद्रीकृत स्थानीय कृषि नेटवर्क",
+          headline: "ताज़ा उपज, समय पर डिलीवरी — आपकी रसोई के नज़दीकी खेतों से",
+          subheadline: "दूर-दराज की थोक मंडियों पर निर्भर रहने के बजाय, हार्वेस्ट रूट प्रमाणित स्थानीय किसानों को एक समन्वित नेटवर्क में जोड़ता है। उच्च गुणवत्ता, बिना किसी रुकावट के पक्की डिलीवरी।",
+          orderCTA: "ताज़ा उपज ऑर्डर करें",
+          farmerCTA: "अपनी फसल दर्ज करें",
+          statFarms: "48+ स्थानीय खेत",
+          statDelivery: "3.8 घंटे खेत से रसोई तक",
+          statReliability: "99.4% समय पर डिलीवरी की गारंटी"
+        },
+        comparison: {
+          title: "पारंपरिक सिंगल-सप्लायर मॉडल क्यों विफल होता है",
+          subtitle: "मल्टी-फार्म विकेंद्रीकृत नेटवर्क आपूर्ति की अनिश्चितता और बर्बादी को समाप्त करता है",
+          col1Title: "एक दूरस्थ थोक सप्लायर",
+          col1Sub: "पारंपरिक मंडी व्यवस्था",
+          col1Point1: "एक जगह समस्या होने पर रेस्टोरेंट का पूरा मेनू प्रभावित होता है",
+          col1Point2: "लंबा परिवहन (3-5 दिन), जिससे उपज खराब होती है",
+          col1Point3: "बिचौलियों के कारण अस्पष्ट और अस्थिर कीमतें",
+          col2Title: "हार्वेस्ट रूट स्थानीय नेटवर्क",
+          col2Sub: "मजबूत विकेंद्रीकृत व्यवस्था",
+          col2Point1: "कई स्थानीय किसान मिलकर 100% ऑर्डर पूरा करते हैं",
+          col2Point2: "सुबह की ताज़ा तुड़ाई, दोपहर के भोजन की तैयारी से पहले डिलीवरी",
+          col2Point3: "पारदर्शी बिलिंग और किसानों को 95% सीधा भुगतान",
+          col3Title: "बैकअप और निरंतरता का लाभ",
+          col3Sub: "स्वचालित बैकअप प्रणाली",
+          col3Point1: "स्मार्ट एल्गोरिदम ऑर्डर को 2 से 4 नज़दीकी खेतों में बांटता है",
+          col3Point2: "फसल कमी की स्थिति में तत्काल रिज़र्व खेत से आपूर्ति",
+          col3Point3: "एक ही वाहन से सीधे आपकी रसोई तक डिलीवरी"
+        },
+        steps: {
+          badge: "सरल 4-चरणीय प्रक्रिया",
+          title: "यह कैसे काम करता है: खेत से रसोई तक",
+          subtitle: "एक ऑर्डर, अनेक मजबूत खेत, और एक सुगम डिलीवरी।",
+          s1Title: "1. ऑर्डर दर्ज करें",
+          s1Desc: "रेस्टोरेंट अपनी आवश्यकतानुसार सब्जियां, मात्रा और समय चुनते हैं।",
+          s2Title: "2. नज़दीकी खेतों से मिलान",
+          s2Desc: "प्रणाली दूरी, स्टॉक और गुणवत्ता के आधार पर ऑर्डर को 2-4 खेतों में बांटती है।",
+          s3Title: "3. सुबह की तुड़ाई की पुष्टि",
+          s3Desc: "किसान सुबह जल्दी तुड़ाई कर डिलीवरी के लिए क्रेट्स तैयार करते हैं।",
+          s4Title: "4. समेकित डिलीवरी",
+          s4Desc: "एक ही तापमान-नियंत्रित वाहन सभी खेतों से उपज लेकर रेस्टोरेंट पहुंचता है।"
+        },
+        benefits: {
+          farmersTitle: "स्थानीय किसानों के लिए",
+          farmersSubtitle: "आप अच्छी उपज उगाने पर ध्यान दें, बाज़ार और लॉजिस्टिक्स की ज़िम्मेदारी हमारी है।",
+          f1: "शीर्ष रेस्टोरेंट और होटलों से नियमित और निरंतर ऑर्डर",
+          f2: "उचित पारदर्शी मूल्य और 95% सीधा सुरक्षित भुगतान",
+          f3: "बिचौलियों और दलालों के कमीशन से पूरी मुक्ति",
+          f4: "सामूहिक सुरक्षा: फसल कमी होने पर दूसरा खेत बिना रुकावट संभाल लेता है",
+          restaurantsTitle: "रसोई और शेफ्स के लिए",
+          restaurantsSubtitle: "मौसम की सबसे ताज़ा उपज और आपूर्ति की गारंटी।",
+          r1: "सुबह तोड़ी गई ताज़गी, जिससे भोजन का स्वाद और पौष्टिकता बरकरार रहे",
+          r2: "स्टॉक खत्म होने का कोई डर नहीं: स्वचालित बैकअप सुरक्षा",
+          r3: "पारदर्शी बिल और हर खेत की पूरी जानकारी",
+          r4: "दैनिक और साप्ताहिक आवर्ती ऑर्डर की आसान सुविधा"
+        },
+        trust: {
+          title: "शीर्ष शेफ्स और प्रमाणित किसानों का भरोसा",
+          quote: "हार्वेस्ट रूट से पहले मंडी में गाड़ी खराब होने पर हमें मेनू से सब्जियां हटानी पड़ती थीं। अब हमारा ऑर्डर 3 नज़दीकी खेतों में बंटा होता है। पिछले 8 महीनों में हमारी एक भी डिलीवरी लेट नहीं हुई।",
+          author: "शेफ अनन्या देशमुख",
+          role: "कार्यकारी शेफ, द स्पाइस रूट बिस्ट्रो"
+        },
+        ctaBanner: {
+          title: "क्या आप अपनी रसोई की उपज आपूर्ति को बेहतर बनाना चाहते हैं?",
+          desc: "ताज़ी और विश्वसनीय खाद्य आपूर्ति के लिए आज ही हमारे नेटवर्क से जुड़ें।",
+          btnRest: "रेस्टोरेंट पोर्टल देखें",
+          btnFarm: "किसान पोर्टल देखें"
+        }
+      },
+      mr: {
+        nav: {
+          home: "मुख्यपृष्ठ",
+          howItWorks: "हे कसे कार्य करते",
+          forFarmers: "शेतकऱ्यांसाठी",
+          forRestaurants: "हॉटेल / रेस्टॉरंटसाठी",
+          network: "आमचे नेटवर्क",
+          contact: "संपर्क",
+          joinFarmer: "शेतकरी पोर्टल",
+          joinRestaurant: "रेस्टॉरंट पोर्टल",
+          signOut: "लॉग आउट",
+          signInRestaurant: "रेस्टॉरंट साइन इन",
+          signInFarmer: "शेतकरी साइन इन",
+          signInTitle: "साइन इन",
+          email: "ईमेल",
+          password: "पासवर्ड",
+          signInBtn: "साइन इन",
+          cancel: "रद्द करा",
+          nameLabel: "तुमचे नाव",
+          namePlaceholder: "तुमचे पूर्ण नाव लिहा",
+          emailPlaceholder: "you@example.com",
+          passwordPlaceholder: "पासवर्ड लिहा",
+          demoNote: "नवीन खाते सुरू करण्यासाठी तुमचे नाव आणि तपशील भरा.",
+          signInError: "कृपया तुमचे नाव, योग्य ईमेल आणि पासवर्ड टाका.",
+          back: "मागे जा",
+          forward: "पुढे जा"
+        },
+        hero: {
+          tagline: "विकेंद्रित स्थानिक कृषी नेटवर्क",
+          headline: "ताजी भाजीपाला, वेळेवर डिलिव्हरी — आपल्या जवळच्या शेतातून",
+          subheadline: "दूरच्या घाऊक बाजारपेठेवर अवलंबून राहण्याऐवजी, हार्वेस्ट रूट प्रमाणित स्थानिक शेतकऱ्यांना एकत्र आणते. उच्च दर्जाचा ताजा माल, कोणतीही अडचण न येता खात्रीशीर डिलिव्हरी.",
+          orderCTA: "ताजा भाजीपाला मागवा",
+          farmerCTA: "तुमचा शेतीमाल नोंदवा",
+          statFarms: "48+ स्थानिक शेते",
+          statDelivery: "3.8 तास शेतापासून स्वयंपाकघरापर्यंत",
+          statReliability: "99.4% वेळेवर डिलिव्हरी हमी"
+        },
+        comparison: {
+          title: "एकच मोठा पुरवठादार का अपयशी ठरतो",
+          subtitle: "मल्टी-फार्म स्थानिक नेटवर्क पुरवठ्यातील अडथळे आणि नासाडी कायमची संपवते",
+          col1Title: "एकच दूरचा पुरवठादार",
+          col1Sub: "जुनी घाऊक पद्धत",
+          col1Point1: "एका ठिकाणी अडचण आल्यास रेस्टॉरंटचे पूर्ण मेनू ठप्प होते",
+          col1Point2: "3 ते 5 दिवस वाहतूक, ज्यामुळे भाजीपाला खराब होतो",
+          col1Point3: "दलालांमुळे न परवडणारे आणि अस्पष्ट दर",
+          col2Title: "हार्वेस्ट रूट स्थानिक नेटवर्क",
+          col2Sub: "मजबूत विकेंद्रित व्यवस्था",
+          col2Point1: "अनेक स्थानिक शेतकरी मिळून 100% पुरवठ्याची हमी देतात",
+          col2Point2: "पहाटेची ताजी तोडणी, दुपारच्या स्वयंपाकापूर्वी थेट डिलिव्हरी",
+          col2Point3: "पारदर्शक दर आणि शेतकऱ्यांना 95% थेट मोबदला",
+          col3Title: "बॅकअप आणि सातत्याचा फायदा",
+          col3Sub: "स्वयंचलित बॅकअप प्रणाली",
+          col3Point1: "अल्गोरिदम ऑर्डर 2 ते 4 जवळच्या शेतांमध्ये विभागून देतो",
+          col3Point2: "अचानक अडचण आल्यास राखीव शेतातून त्वरित पुरवठा",
+          col3Point3: "एकाच वाहनातून थेट तुमच्या रेस्टॉरंटच्या दारात डिलिव्हरी"
+        },
+        steps: {
+          badge: "सोपी 4-टप्प्यांची प्रक्रिया",
+          title: "हे कसे चालते: शेतापासून टेबलपर्यंत",
+          subtitle: "एकच ऑर्डर, अनेक सक्षम शेतकरी, आणि एक वेळेवर डिलिव्हरी.",
+          s1Title: "1. ऑर्डर नोंदवा",
+          s1Desc: "रेस्टॉरंट आवश्यक भाजीपाला, प्रमाण आणि डिलिव्हरीची वेळ निवडतात.",
+          s2Title: "2. जवळच्या शेतकऱ्यांशी जोडणी",
+          s2Desc: "प्रणाली अंतर आणि साठ्यानुसार 2 ते 4 शेतकऱ्यांमध्ये ऑर्डर विभागते.",
+          s3Title: "3. सकाळच्या तोडणीची पुष्टी",
+          s3Desc: "शेतकरी पहाटे ताजी तोडणी करून क्रेट्समध्ये माल भरतात.",
+          s4Title: "4. एकत्रित डिलिव्हरी",
+          s4Desc: "एकच तापमान-नियंत्रित गाडी सर्व शेतातून माल गोळा करून थेट पोहोचवते."
+        },
+        benefits: {
+          farmersTitle: "स्थानिक शेतकऱ्यांसाठी",
+          farmersSubtitle: "तुम्ही दर्जेदार शेतीमाल पिकवण्यावर लक्ष केंद्रित करा, बाजारपेठ आणि वाहतूक आम्ही सांभाळू.",
+          f1: "नामांकित रेस्टॉरंट्स आणि हॉटेल्सकडून नियमित आणि खात्रीशीर ऑर्डर्स",
+          f2: "वाजवी दर आणि 95% थेट खात्यात जमा होणारा सुरक्षित मोबदला",
+          f3: "दलाल आणि मध्यस्थांच्या कमिशनपासून पूर्ण सुटका",
+          f4: "सामूहिक बॅकअप: मालाची कमतरता भासल्यास शेजारील शेतकरी तात्काळ मदत करतो",
+          restaurantsTitle: "रेस्टॉरंट्स आणि शेफ्ससाठी",
+          restaurantsSubtitle: "हंगामी सर्वोत्तम ताजेपणा आणि पुरवठ्याची पूर्ण हमी.",
+          r1: "पहाटे तोडलेला ताजा भाजीपाला, ज्यामुळे पदार्थांची चव उत्तम राहते",
+          r2: "माल संपण्याची भीती नाही: स्वयंचलित बॅकअप शेताची व्यवस्था",
+          r3: "तपशीलवार बिल आणि प्रत्येक शेताची पारदर्शक माहिती",
+          r4: "दैनिक आणि साप्ताहिक नियमित ऑर्डरची सोपी सुविधा"
+        },
+        trust: {
+          title: "नामांकित शेफ्स आणि सेंद्रिय शेतकऱ्यांचा विश्वास",
+          quote: "हार्वेस्ट रूट सुरू करण्यापूर्वी मार्केट यार्डमध्ये गाडी अडकल्यास आम्हाला मेनूमधील पदार्थ रद्द करावे लागत. आता आमची ऑर्डर नाशिक-पुणे परिसरातील 3 शेतांमध्ये विभागलेली असते. गेल्या 8 महिन्यांत एकही दिवस उशीर झाला नाही.",
+          author: "शेफ अनन्या देशमुख",
+          role: "मुख्य शेफ, द स्पाइस रूट बिस्ट्रो"
+        },
+        ctaBanner: {
+          title: "तुमच्या स्वयंपाकघरासाठी खात्रीशीर ताजा भाजीपाला हवा आहे का?",
+          desc: "ताजी आणि विश्वासार्ह शेतीमाल साखळी उभारण्यासाठी आजच आमच्या नेटवर्कमध्ये सहभागी व्हा.",
+          btnRest: "रेस्टॉरंट पोर्टल पहा",
+          btnFarm: "शेतकरी पोर्टल पहा"
+        }
+      }
+    };
+
+    // --- REALISTIC INDIAN PARTICIPANTS ---
+    const APP_USERS = {
+      restaurant: {
+        id: "usr_rest_1",
+        email: "chef@spiceroute.in",
+        role: "restaurant",
+        name: "Chef Ananya Deshmukh",
+        organization: "The Spice Route Bistro",
+        address: "Plot 42, High Street, Pune-Mumbai Highway",
+        cuisine: "Regional Indian & Contemporary Kitchen",
+        volume: "50-70 crates/week",
+        rating: 4.9
+      },
+      farmer: {
+        id: "usr_farm_1",
+        email: "ramesh@sahyadriagro.in",
+        role: "farmer",
+        name: "Ramesh Patil",
+        organization: "Sahyadri Agro Producer Co.",
+        address: "Survey 114, Junnar Valley, Pune District (12 km)",
+        capacity: "2,500 kg/week",
+        crops: ["Desi Tomatoes", "Organic Spinach", "Fresh Coriander", "Fresh Mint"],
+        onTimeRate: 99.4,
+        qualityRating: 4.95,
+        totalEarnings: 184500.00,
+        stripeConnected: true
+      }
+    };
+
+    // --- REALISTIC INDIAN AGRICULTURAL PRODUCE CATALOG (INR PRICING) ---
+    const INDIAN_PRODUCE = [
+      {
+        id: "prod_1",
+        name: "Desi Red Tomatoes (गावठी टोमॅटो / देशी टमाटर)",
+        category: "Vine Produce",
+        unit: "kg",
+        description: "Naturally vine-ripened, juicy, firm grading with natural acidity. Picked early morning.",
+        imageUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", price: 38.00, stock: 240, harvestReady: "Today Morning", distance: "12 km" },
+          { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", price: 40.00, stock: 160, harvestReady: "Today Afternoon", distance: "18 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 36.00, stock: 800, harvestReady: "Available on Call", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_2",
+        name: "Organic Green Spinach (पालक / Palak)",
+        category: "Leafy Greens",
+        unit: "kg",
+        description: "Broad tender leaves, chemical-free irrigation, zero sand grit, bunched fresh at dawn.",
+        imageUrl: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", price: 25.00, stock: 180, harvestReady: "Picked 6 AM Today", distance: "12 km" },
+          { farmerId: "usr_farm_3", farmName: "Bhimashankar Organic Cluster", price: 26.00, stock: 120, harvestReady: "Today", distance: "15 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 24.00, stock: 450, harvestReady: "Tomorrow", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_3",
+        name: "Nashik Red Onions (नाशिक कांदा / लाल प्याज)",
+        category: "Root Vegetables",
+        unit: "kg",
+        description: "Lasalgaon grade red onions, cured skin, high pungency, uniform bulb grading (55mm+).",
+        imageUrl: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", price: 28.00, stock: 650, harvestReady: "Cured & Ready", distance: "18 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 26.50, stock: 1200, harvestReady: "Warehouse Stock", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_4",
+        name: "Crisp Sweet Carrots (गाजर / Gajar)",
+        category: "Root Vegetables",
+        unit: "kg",
+        description: "Tender orange crunchy roots, washed and cleaned, high natural sweetness for kitchen bases.",
+        imageUrl: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", price: 35.00, stock: 320, harvestReady: "Harvested Today", distance: "18 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 32.00, stock: 600, harvestReady: "Available Daily", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_5",
+        name: "Fresh Coriander Leaves (कोथिंबीर / हरा धनिया)",
+        category: "Herbs & Seasoning",
+        unit: "kg",
+        description: "Deep green aromatic leaves, root washed, packed with natural moisture barrier for shelf life.",
+        imageUrl: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", price: 30.00, stock: 95, harvestReady: "Cut to Order", distance: "12 km" },
+          { farmerId: "usr_farm_3", farmName: "Bhimashankar Organic Cluster", price: 32.00, stock: 80, harvestReady: "Today Morning", distance: "15 km" }
+        ]
+      },
+      {
+        id: "prod_6",
+        name: "Shimla Green Capsicum (ढोबळी मिरची / शिमला मिर्च)",
+        category: "Vine Produce",
+        unit: "kg",
+        description: "Thick-walled crunchy bell peppers, uniform 4-lobe shape, sorted for restaurant prep.",
+        imageUrl: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", price: 45.00, stock: 210, harvestReady: "Fresh Batch", distance: "18 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 42.00, stock: 400, harvestReady: "In Buffer", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_7",
+        name: "Spicy Green Chillies (लवंगी मिरची / हरी मिर्च)",
+        category: "Herbs & Seasoning",
+        unit: "kg",
+        description: "Bright green Lavangi chillies with crisp snap and high heat rating. Clean farm sort.",
+        imageUrl: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_3", farmName: "Bhimashankar Organic Cluster", price: 55.00, stock: 90, harvestReady: "Today", distance: "15 km" },
+          { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", price: 58.00, stock: 60, harvestReady: "Cut Today", distance: "12 km" }
+        ]
+      },
+      {
+        id: "prod_8",
+        name: "Fresh Mint Leaves (पुदिना / Pudina)",
+        category: "Herbs & Seasoning",
+        unit: "kg",
+        description: "Fragrant tender mint shoots, unbruised leaves, ideal for chutneys and kitchen prep.",
+        imageUrl: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", price: 40.00, stock: 75, harvestReady: "Cut 6 AM", distance: "12 km" },
+          { farmerId: "usr_farm_3", farmName: "Bhimashankar Organic Cluster", price: 42.00, stock: 50, harvestReady: "Today", distance: "15 km" }
+        ]
+      },
+      {
+        id: "prod_9",
+        name: "Farm Fresh Potatoes (बटाटा / आलू - Jyoti)",
+        category: "Root Vegetables",
+        unit: "crate (20 kg)",
+        description: "Thin-skinned firm Jyoti potatoes, uniform size, low sugar, ideal for roasting and curries.",
+        imageUrl: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", price: 480.00, stock: 85, harvestReady: "Cured & Ready", distance: "18 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 460.00, stock: 250, harvestReady: "Warehouse Stock", distance: "22 km" }
+        ]
+      },
+      {
+        id: "prod_10",
+        name: "Fresh Ginger (आले / अदरक)",
+        category: "Herbs & Seasoning",
+        unit: "kg",
+        description: "Firm aromatic rhizomes, washed clean, strong pungency and high juice content.",
+        imageUrl: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80",
+        farmPrices: [
+          { farmerId: "usr_farm_3", farmName: "Bhimashankar Organic Cluster", price: 90.00, stock: 110, harvestReady: "Cleaned Roots", distance: "15 km" },
+          { farmerId: "usr_farm_4", farmName: "Maharashtra Krishi FPC (Standby)", price: 85.00, stock: 350, harvestReady: "In Storage", distance: "22 km" }
+        ]
+      }
+    ];
+
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      const [lang, setLang] = useState("en");
+      
+      // Navigation History Stack Management
+      const [currentView, setCurrentView] = useState("home"); // 'home' | 'restaurant' | 'farmer'
+      const [history, setHistory] = useState(["home"]);
+      const [historyIndex, setHistoryIndex] = useState(0);
+
+      const [currentUser, setCurrentUser] = useState(null); // active role context
+      const [restaurantTab, setRestaurantTab] = useState("order"); // 'order' | 'tracker' | 'recurring' | 'invoices' | 'notifications'
+      const [farmerTab, setFarmerTab] = useState("inventory"); // 'inventory' | 'requests' | 'calendar' | 'earnings' | 'notifications'
+      
+      const [authModalOpen, setAuthModalOpen] = useState(false);
+      const [authRole, setAuthRole] = useState("restaurant");
+      const [isSignUp, setIsSignUp] = useState(false);
+
+      // State stores
+      const [produceList, setProduceList] = useState(INDIAN_PRODUCE);
+      const [orders, setOrders] = useState([]);
+      const [cart, setCart] = useState([]);
+      const [selectedCategory, setSelectedCategory] = useState("All");
+      const [orderTimeSlot, setOrderTimeSlot] = useState("11:00 AM - 1:00 PM (Lunch Prep Window)");
+      const [orderDeliveryDate, setOrderDeliveryDate] = useState("Tomorrow");
+      const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+
+      // Active Stock Edit Modal State
+      const [editingStockItem, setEditingStockItem] = useState(null);
+
+      // Role Notifications
+      const [restaurantNotifications, setRestaurantNotifications] = useState([]);
+
+      const [farmerNotifications, setFarmerNotifications] = useState([]);
+
+      // Recurring orders
+      const [recurringOrders, setRecurringOrders] = useState([]);
+
+      const [signInRole, setSignInRole] = useState(null); // null | "restaurant" | "farmer"
+      // Supply Redundancy Plan is optional: the restaurant chooses it per order (off by default)
+      const [useRedundancy, setUseRedundancy] = useState(false);
+
+      const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+
+      // Wipe all session data so every sign-in starts completely fresh
+      const resetSessionData = () => {
+        setCart([]);
+        setOrders([]);
+        setRestaurantNotifications([]);
+        setFarmerNotifications([]);
+        setRecurringOrders([]);
+        setProduceList(INDIAN_PRODUCE);
+        setRestaurantTab("order");
+        setFarmerTab("inventory");
+        setOrderDeliveryDate("Tomorrow");
+        setOrderTimeSlot("11:00 AM - 1:00 PM (Lunch Prep Window)");
+        setUseRedundancy(false);
+        setCheckoutModalOpen(false);
+        setEditingStockItem(null);
+      };
+
+      // A portal can only be opened by someone signed in with that role
+      const canOpenView = (view, user = currentUser) => {
+        if (view === 'home') return true;
+        return !!user && user.role === view;
+      };
+
+      // History-aware Navigation Function
+      const navigateTo = (view) => {
+        if (!canOpenView(view)) {
+          setSignInRole(view); // ask them to sign in first
+          return;
+        }
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(view);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        setCurrentView(view);
+      };
+
+      const goBack = () => {
+        if (historyIndex > 0) {
+          const newIdx = historyIndex - 1;
+          const targetView = history[newIdx];
+          setHistoryIndex(newIdx);
+          setCurrentView(canOpenView(targetView) ? targetView : 'home');
+        }
+      };
+
+      const goForward = () => {
+        if (historyIndex < history.length - 1) {
+          const newIdx = historyIndex + 1;
+          const targetView = history[newIdx];
+          setHistoryIndex(newIdx);
+          setCurrentView(canOpenView(targetView) ? targetView : 'home');
+        }
+      };
+
+      // Sign in with the name the person typed: brand-new, empty account
+      const handleSignInSuccess = ({ name, email }) => {
+        const role = signInRole;
+        const cleanName = name.trim();
+        const user = role === 'restaurant'
+          ? { id: `usr_rest_${Date.now()}`, role, name: cleanName, email, organization: `${cleanName}'s Kitchen` }
+          : { id: `usr_farm_${Date.now()}`, role, name: cleanName, email, organization: `${cleanName}'s Farm`, totalEarnings: 0, onTimeRate: null };
+        resetSessionData();
+        setCurrentUser(user);
+        setSignInRole(null);
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(role);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        setCurrentView(role);
+      };
+
+      const handleSignOut = () => {
+        setCurrentUser(null);
+        resetSessionData();
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push('home');
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        setCurrentView('home');
+      };
+
+      // Cart Helpers
+      const addToCart = (prod) => {
+        setCart(prev => {
+          const exists = prev.find(item => item.produceId === prod.id);
+          if (exists) {
+            return prev.map(item => item.produceId === prod.id ? { ...item, qty: item.qty + 5 } : item);
+          }
+          return [...prev, { produceId: prod.id, name: prod.name, qty: 10, unit: prod.unit, price: prod.farmPrices[0].price }];
+        });
+      };
+
+      const updateCartQty = (prodId, delta) => {
+        setCart(prev => prev.map(item => {
+          if (item.produceId === prodId) {
+            const newQ = Math.max(1, item.qty + delta);
+            return { ...item, qty: newQ };
+          }
+          return item;
+        }).filter(item => item.qty > 0));
+      };
+
+      const removeFromCart = (prodId) => {
+        setCart(prev => prev.filter(item => item.produceId !== prodId));
+      };
+
+      const cartTotal = useMemo(() => {
+        return cart.reduce((sum, item) => sum + (item.qty * item.price), 0);
+      }, [cart]);
+
+      // Allocation preview: depends on whether the user chose the Supply Redundancy Plan
+      const matchingPreview = useMemo(() => {
+        if (!cart.length) return null;
+
+        const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+        const total = Math.round(cartTotal * 100) / 100;
+
+        if (!useRedundancy) {
+          return {
+            redundant: false,
+            primaryFarm: {
+              name: "Sahyadri Agro Producer Co.",
+              distance: "12 km (Junnar)",
+              sharePercent: "100%",
+              allocatedQty: `${totalQty} kg`,
+              status: "Primary Supplier Confirmed"
+            },
+            secondaryFarm: null,
+            standbyFarm: null,
+            totalAmount: total,
+            routeSummary: "Direct Van: Sahyadri Agro -> Single Kitchen Delivery"
+          };
+        }
+
+        const split1Qty = Math.ceil(totalQty * 0.6);
+        const split2Qty = totalQty - split1Qty;
+
+        return {
+          redundant: true,
+          primaryFarm: {
+            name: "Sahyadri Agro Producer Co.",
+            distance: "12 km (Junnar)",
+            sharePercent: "60%",
+            allocatedQty: `${split1Qty} kg`,
+            status: "Primary Supplier Confirmed"
+          },
+          secondaryFarm: {
+            name: "Godavari Fresh Farms",
+            distance: "18 km (Nashik)",
+            sharePercent: "40%",
+            allocatedQty: `${split2Qty} kg`,
+            status: "Secondary Supplier Confirmed"
+          },
+          standbyFarm: {
+            name: "Maharashtra Krishi FPC",
+            distance: "22 km (Narayangaon)",
+            status: "100% Reserve Buffer on Standby"
+          },
+          totalAmount: total,
+          routeSummary: "Consolidated Eco-Van: Sahyadri Agro -> Godavari Fresh -> Single Kitchen Delivery"
+        };
+      }, [cart, cartTotal, useRedundancy]);
+
+      // Complete Order via Payment Simulator
+      const completeOrder = () => {
+        const newOrderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+        const redundant = !!matchingPreview?.redundant;
+        const total = Math.round(cartTotal * 100) / 100;
+        const contributingFarmers = redundant
+          ? [
+              { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", items: `${matchingPreview.primaryFarm.allocatedQty} of produce`, amount: Math.round(cartTotal * 0.6 * 100) / 100, status: "confirmed_harvest" },
+              { farmerId: "usr_farm_2", farmName: "Godavari Fresh Farms", items: `${matchingPreview.secondaryFarm.allocatedQty} of produce`, amount: Math.round(cartTotal * 0.4 * 100) / 100, status: "confirmed_harvest" }
+            ]
+          : [
+              { farmerId: "usr_farm_1", farmName: "Sahyadri Agro Producer Co.", items: `${matchingPreview.primaryFarm.allocatedQty} of produce`, amount: total, status: "confirmed_harvest" }
+            ];
+
+        const newOrder = {
+          id: newOrderId,
+          restaurantId: currentUser.id,
+          restaurantName: currentUser.organization,
+          status: "confirmed",
+          stepIndex: 1,
+          deliveryDate: orderDeliveryDate,
+          deliveryTimeSlot: orderTimeSlot,
+          totalAmount: total,
+          paymentStatus: "paid_online",
+          redundancyEnabled: redundant,
+          redundancyLevel: redundant
+            ? "Multi-Farm Supply Redundancy Active"
+            : "Standard Supply: Single Farm (no redundancy plan selected)",
+          routeOptimization: redundant
+            ? "Route Alpha: Sahyadri Agro -> Godavari Fresh -> Kitchen Gate"
+            : "Direct Route: Sahyadri Agro -> Kitchen Gate",
+          contributingFarmers,
+          itemsList: cart.map(c => ({
+            name: c.name,
+            qty: c.qty,
+            unit: c.unit,
+            price: c.price,
+            allocatedFarm: "Sahyadri Agro Producer Co."
+          }))
+        };
+
+        setOrders(prev => [newOrder, ...prev]);
+        setCart([]);
+        setCheckoutModalOpen(false);
+        setRestaurantTab("tracker");
+
+        setRestaurantNotifications(prev => [
+          {
+            id: `r-notif-${Date.now()}`,
+            title: "Order Secured and Confirmed",
+            message: `Order #${newOrderId} confirmed with ${contributingFarmers.length} local farm${contributingFarmers.length > 1 ? "s" : ""}${redundant ? " and a standby reserve" : ""}. Total: Rs. ${newOrder.totalAmount.toFixed(2)}.`,
+            time: "Just now",
+            read: false,
+            type: "payment"
+          },
+          ...prev
+        ]);
+      };
+
+      // Progress Order Status
+      const advanceOrderStatus = (orderId) => {
+        setOrders(prev => prev.map(o => {
+          if (o.id === orderId) {
+            const nextStep = o.stepIndex < 4 ? o.stepIndex + 1 : 4;
+            const statusMap = { 1: "confirmed", 2: "harvesting", 3: "in_transit", 4: "delivered" };
+            const nextStatus = statusMap[nextStep];
+            return { ...o, stepIndex: nextStep, status: nextStatus };
+          }
+          return o;
+        }));
+      };
+
+      // Shortfall Failover Trigger
+      const triggerShortfall = (orderId, failingFarmName) => {
+        setOrders(prev => prev.map(o => {
+          if (o.id === orderId && o.redundancyEnabled) {
+            setRestaurantNotifications(prevNotifs => [
+              {
+                id: `r-notif-${Date.now()}`,
+                title: "Redundancy Protection Activated",
+                message: `${failingFarmName} reported morning shortfall. System automatically routed quota to Maharashtra Krishi FPC reserve. Delivery schedule unchanged.`,
+                time: "Just now",
+                read: false,
+                type: "warning"
+              },
+              ...prevNotifs
+            ]);
+            return {
+              ...o,
+              redundancyLevel: "Failover Activated: Reserve Cluster Absorbed Quota",
+              routeOptimization: "Rerouted: Maharashtra Krishi Reserve Hub -> Kitchen Gate (Guaranteed On-Time)"
+            };
+          }
+          return o;
+        }));
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#2A1E15]">
+          {/* MAIN NAVBAR WITH WORKING BACK/FORWARD AND SIGN IN */}
+          <header className="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur border-b border-earth-200 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+              
+              {/* LEFT: BACK / FORWARD NAVIGATION & BRAND LOGO */}
+              <div className="flex items-center gap-4">
+                {/* BACK & FORWARD BUTTONS */}
+                <div className="flex items-center gap-1 bg-earth-200/70 p-1 rounded-xl border border-earth-300">
+                  <button 
+                    onClick={goBack}
+                    disabled={historyIndex === 0}
+                    title={t.nav.back}
+                    className={`p-1.5 rounded-lg transition ${historyIndex > 0 ? 'text-forest-900 hover:bg-earth-300' : 'text-earth-400 cursor-not-allowed'}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button 
+                    onClick={goForward}
+                    disabled={historyIndex >= history.length - 1}
+                    title={t.nav.forward}
+                    className={`p-1.5 rounded-lg transition ${historyIndex < history.length - 1 ? 'text-forest-900 hover:bg-earth-300' : 'text-earth-400 cursor-not-allowed'}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* BRAND LOGO */}
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigateTo('home')}>
+                  <div className="w-10 h-10 rounded-xl bg-forest-800 text-harvest-300 flex items-center justify-center shadow-inner">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="font-serif text-2xl font-bold tracking-tight text-forest-950 block leading-none">Harvest Route</span>
+                    <span className="text-[10px] tracking-widest uppercase font-semibold text-earth-500">Local Farm Redundancy</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CENTER NAV LINKS */}
+              <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-forest-900">
+                <button onClick={() => navigateTo('home')} className={`hover:text-forest-600 transition ${currentView === 'home' ? 'text-forest-700 font-bold' : ''}`}>
+                  {t.nav.home}
+                </button>
+                <button onClick={() => navigateTo('restaurant')} className={`hover:text-forest-600 transition ${currentView === 'restaurant' ? 'text-forest-700 font-bold' : ''}`}>
+                  {t.nav.forRestaurants}
+                </button>
+                <button onClick={() => navigateTo('farmer')} className={`hover:text-forest-600 transition ${currentView === 'farmer' ? 'text-forest-700 font-bold' : ''}`}>
+                  {t.nav.forFarmers}
+                </button>
+              </nav>
+
+              {/* RIGHT ACTIONS: SIGN IN BUTTONS + LANGUAGE SELECTOR + PORTALS */}
+              <div className="flex items-center gap-3">
+                {/* SIGN IN BUTTONS (shown when signed out) */}
+                {!currentUser && (
+                  <>
+                    <button
+                      onClick={() => setSignInRole('restaurant')}
+                      className="px-3.5 py-2 text-xs font-bold rounded-lg bg-forest-800 hover:bg-forest-900 text-earth-50 shadow-sm transition"
+                    >
+                      {t.nav.signInRestaurant}
+                    </button>
+                    <button
+                      onClick={() => setSignInRole('farmer')}
+                      className="px-3.5 py-2 text-xs font-bold rounded-lg border border-forest-800 text-forest-900 hover:bg-earth-200 transition"
+                    >
+                      {t.nav.signInFarmer}
+                    </button>
+                  </>
+                )}
+
+                {/* LANGUAGE SELECTOR (EN, HI, MR) */}
+                <div className="relative">
+                  <select 
+                    value={lang} 
+                    onChange={(e) => setLang(e.target.value)}
+                    className="bg-earth-100 border border-earth-300 text-forest-900 text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none focus:ring-2 focus:ring-forest-600 cursor-pointer"
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                  </select>
+                </div>
+
+                {/* SIGN OUT IF ON A PORTAL */}
+                {currentUser && (
+                  <button 
+                    onClick={handleSignOut}
+                    className="px-3 py-1.5 text-xs font-semibold rounded-lg text-earth-700 hover:text-earth-900 hover:bg-earth-200 transition"
+                  >
+                    {t.nav.signOut}
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* MAIN VIEW CONTROLLER */}
+          {currentView === 'home' ? (
+            <LandingPageView 
+              t={t} 
+              onNavigate={navigateTo}
+            />
+          ) : currentView === 'restaurant' && currentUser?.role === 'restaurant' ? (
+            <RestaurantDashboardView 
+              user={currentUser}
+              activeTab={restaurantTab}
+              setActiveTab={setRestaurantTab}
+              produceList={produceList}
+              cart={cart}
+              addToCart={addToCart}
+              updateCartQty={updateCartQty}
+              removeFromCart={removeFromCart}
+              cartTotal={cartTotal}
+              matchingPreview={matchingPreview}
+              useRedundancy={useRedundancy}
+              setUseRedundancy={setUseRedundancy}
+              orderTimeSlot={orderTimeSlot}
+              setOrderTimeSlot={setOrderTimeSlot}
+              orderDeliveryDate={orderDeliveryDate}
+              setOrderDeliveryDate={setOrderDeliveryDate}
+              orders={orders}
+              recurringOrders={recurringOrders}
+              setRecurringOrders={setRecurringOrders}
+              notifications={restaurantNotifications}
+              setNotifications={setRestaurantNotifications}
+              onOpenCheckout={() => setCheckoutModalOpen(true)}
+              onAdvanceStatus={advanceOrderStatus}
+              onSimulateShortfall={triggerShortfall}
+            />
+          ) : currentView === 'farmer' && currentUser?.role === 'farmer' ? (
+            <FarmerDashboardView 
+              user={currentUser}
+              activeTab={farmerTab}
+              setActiveTab={setFarmerTab}
+              orders={orders}
+              produceList={produceList}
+              notifications={farmerNotifications}
+              setNotifications={setFarmerNotifications}
+              onAddProduce={(newP) => setProduceList(prev => [newP, ...prev])}
+              onEditStockItem={(item) => setEditingStockItem(item)}
+              onAdvanceStatus={advanceOrderStatus}
+            />
+          ) : null}
+
+          {/* SIGN IN MODAL */}
+          {signInRole && (
+            <SignInModal
+              role={signInRole}
+              t={t}
+              onClose={() => setSignInRole(null)}
+              onSuccess={handleSignInSuccess}
+            />
+          )}
+
+          {/* EDIT STOCK MODAL FOR FARMERS */}
+          {editingStockItem && (
+            <EditStockModal 
+              item={editingStockItem}
+              farmerId={currentUser?.id}
+              onClose={() => setEditingStockItem(null)}
+              onSave={(updatedItem) => {
+                setProduceList(prev => prev.map(p => p.id === updatedItem.id ? updatedItem : p));
+                setEditingStockItem(null);
+                setFarmerNotifications(prev => [
+                  {
+                    id: `f-notif-${Date.now()}`,
+                    title: "Stock Updated Successfully",
+                    message: `Inventory updated for ${updatedItem.name}.`,
+                    time: "Just now",
+                    read: false,
+                    type: "inventory"
+                  },
+                  ...prev
+                ]);
+              }}
+            />
+          )}
+
+          {/* CHECKOUT MODAL */}
+          {checkoutModalOpen && (
+            <CheckoutModal 
+              isOpen={checkoutModalOpen}
+              onClose={() => setCheckoutModalOpen(false)}
+              cartTotal={cartTotal}
+              matchingPreview={matchingPreview}
+              onComplete={completeOrder}
+            />
+          )}
+
+          {/* CLEAN PROFESSIONAL FOOTER */}
+          <footer id="contact" className="bg-forest-950 text-earth-200 border-t border-forest-900 mt-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-forest-800 text-harvest-400 flex items-center justify-center">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/></svg>
+                    </div>
+                    <span className="font-serif text-xl font-bold text-earth-50">Harvest Route</span>
+                  </div>
+                  <p className="text-xs text-earth-400 leading-relaxed max-w-sm">
+                    Decentralizing regional agricultural supply. Connecting commercial kitchens with resilient farming clusters to guarantee zero menu disruption.
+                  </p>
+                  <p className="text-[11px] text-earth-500">
+                    &copy; 2026 Harvest Route Systems. All rights reserved.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-serif text-sm font-semibold text-harvest-300 uppercase tracking-wider mb-3">Portals & Navigation</h4>
+                  <ul className="space-y-2 text-xs text-earth-300">
+                    <li><button onClick={() => navigateTo('restaurant')} className="hover:text-white transition">Restaurant Ordering Portal</button></li>
+                    <li><button onClick={() => navigateTo('farmer')} className="hover:text-white transition">Farmer Inventory Portal</button></li>
+                    <li><button onClick={() => navigateTo('home')} className="hover:text-white transition">Home & Overview</button></li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-serif text-sm font-semibold text-harvest-300 uppercase tracking-wider mb-3">Regional Network Hub</h4>
+                  <div className="space-y-2 text-xs text-earth-300">
+                    <p>Dispatch Cluster: Pune-Nashik Agricultural Corridor</p>
+                    <p>Kitchen Support: +91 (800) 555-FARM</p>
+                    <p>Inquiries: operations@harvestroute.local</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // LANDING PAGE VIEW COMPONENT (ZERO EMOJIS, FOCUSED CONTENT)
+    // =========================================================================
+    function LandingPageView({ t, onNavigate }) {
+      return (
+        <div>
+          {/* HERO SECTION */}
+          <section className="relative overflow-hidden hero-pattern text-white py-20 lg:py-28">
+            <div className="absolute inset-0 bg-gradient-to-b from-forest-950/70 via-transparent to-forest-950"></div>
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center lg:text-left">
+              <div className="max-w-3xl space-y-6">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-800/80 border border-forest-600 text-harvest-300 text-xs font-semibold tracking-wide uppercase">
+                  <span className="w-2 h-2 rounded-full bg-harvest-400"></span>
+                  {t.hero.tagline}
+                </div>
+                <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-earth-50 leading-[1.15]">
+                  {t.hero.headline}
+                </h1>
+                <p className="text-base sm:text-lg text-earth-200 font-light leading-relaxed">
+                  {t.hero.subheadline}
+                </p>
+                <div className="flex flex-wrap items-center gap-4 pt-3 justify-center lg:justify-start">
+                  <button 
+                    onClick={() => onNavigate('restaurant')}
+                    className="px-6 py-3.5 bg-harvest-500 hover:bg-harvest-600 text-forest-950 font-bold rounded-xl shadow-lg transition text-sm flex items-center gap-2"
+                  >
+                    <span>{t.hero.orderCTA}</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </button>
+                  <button 
+                    onClick={() => onNavigate('farmer')}
+                    className="px-6 py-3.5 bg-forest-800/90 hover:bg-forest-800 text-earth-100 font-semibold rounded-xl border border-forest-600 shadow transition text-sm flex items-center gap-2"
+                  >
+                    <span>{t.hero.farmerCTA}</span>
+                  </button>
+                </div>
+                
+                {/* Trust Badges */}
+                <div className="grid grid-cols-3 gap-6 pt-8 border-t border-forest-800/80 max-w-lg">
+                  <div>
+                    <div className="font-serif text-2xl font-bold text-harvest-300">{t.hero.statFarms}</div>
+                    <div className="text-xs text-earth-300">Clustered regionally</div>
+                  </div>
+                  <div>
+                    <div className="font-serif text-2xl font-bold text-harvest-300">{t.hero.statDelivery}</div>
+                    <div className="text-xs text-earth-300">Farm-to-kitchen</div>
+                  </div>
+                  <div>
+                    <div className="font-serif text-2xl font-bold text-harvest-300">{t.hero.statReliability}</div>
+                    <div className="text-xs text-earth-300">Failover protection</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* PROBLEM VS SOLUTION COMPARISON SECTION */}
+          <section id="comparison" className="py-20 bg-earth-100/60 border-y border-earth-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="text-xs font-bold uppercase tracking-widest text-forest-700 block mb-2">STRUCTURAL ARCHITECTURE</span>
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">{t.comparison.title}</h2>
+                <p className="mt-3 text-sm sm:text-base text-earth-700">{t.comparison.subtitle}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Col 1 */}
+                <div className="bg-white rounded-2xl p-7 border border-red-200 shadow-sm relative overflow-hidden">
+                  <span className="text-xs uppercase font-bold text-red-700 tracking-wider block mb-1">Traditional Supply</span>
+                  <h3 className="font-serif text-xl font-bold text-red-950">{t.comparison.col1Title}</h3>
+                  <p className="text-xs text-red-700 font-medium mb-5">{t.comparison.col1Sub}</p>
+                  <ul className="space-y-3 text-xs text-earth-800">
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-500 font-bold">--</span>
+                      <span>{t.comparison.col1Point1}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-500 font-bold">--</span>
+                      <span>{t.comparison.col1Point2}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-500 font-bold">--</span>
+                      <span>{t.comparison.col1Point3}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Col 2 */}
+                <div className="bg-white rounded-2xl p-7 border border-forest-300 shadow-sm relative overflow-hidden">
+                  <span className="text-xs uppercase font-bold text-forest-700 tracking-wider block mb-1">Local Network</span>
+                  <h3 className="font-serif text-xl font-bold text-forest-950">{t.comparison.col2Title}</h3>
+                  <p className="text-xs text-forest-700 font-medium mb-5">{t.comparison.col2Sub}</p>
+                  <ul className="space-y-3 text-xs text-earth-800">
+                    <li className="flex items-start gap-2">
+                      <span className="text-forest-700 font-bold">+</span>
+                      <span>{t.comparison.col2Point1}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-forest-700 font-bold">+</span>
+                      <span>{t.comparison.col2Point2}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-forest-700 font-bold">+</span>
+                      <span>{t.comparison.col2Point3}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Col 3 */}
+                <div className="bg-forest-900 text-earth-50 rounded-2xl p-7 border border-forest-700 shadow-lg relative overflow-hidden">
+                  <span className="text-xs uppercase font-bold text-harvest-300 tracking-wider block mb-1">Redundancy Guarantee</span>
+                  <h3 className="font-serif text-xl font-bold text-harvest-300">{t.comparison.col3Title}</h3>
+                  <p className="text-xs text-harvest-200/80 font-medium mb-5">{t.comparison.col3Sub}</p>
+                  <ul className="space-y-3 text-xs text-earth-200">
+                    <li className="flex items-start gap-2">
+                      <span className="text-harvest-400 font-bold">*</span>
+                      <span>{t.comparison.col3Point1}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-harvest-400 font-bold">*</span>
+                      <span>{t.comparison.col3Point2}</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-harvest-400 font-bold">*</span>
+                      <span>{t.comparison.col3Point3}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 4-STEP HOW IT WORKS FLOW */}
+          <section id="how-it-works" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="text-xs font-bold uppercase tracking-widest text-forest-700 block mb-2">{t.steps.badge}</span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">{t.steps.title}</h2>
+              <p className="mt-3 text-sm sm:text-base text-earth-700">{t.steps.subtitle}</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-2xl border border-earth-200 shadow-sm">
+                <span className="font-serif text-3xl font-extrabold text-forest-200 block mb-3">01</span>
+                <h4 className="font-serif text-lg font-bold text-forest-950 mb-2">{t.steps.s1Title}</h4>
+                <p className="text-xs text-earth-700 leading-relaxed">{t.steps.s1Desc}</p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-earth-200 shadow-sm">
+                <span className="font-serif text-3xl font-extrabold text-harvest-200 block mb-3">02</span>
+                <h4 className="font-serif text-lg font-bold text-forest-950 mb-2">{t.steps.s2Title}</h4>
+                <p className="text-xs text-earth-700 leading-relaxed">{t.steps.s2Desc}</p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-earth-200 shadow-sm">
+                <span className="font-serif text-3xl font-extrabold text-forest-200 block mb-3">03</span>
+                <h4 className="font-serif text-lg font-bold text-forest-950 mb-2">{t.steps.s3Title}</h4>
+                <p className="text-xs text-earth-700 leading-relaxed">{t.steps.s3Desc}</p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-earth-200 shadow-sm">
+                <span className="font-serif text-3xl font-extrabold text-harvest-200 block mb-3">04</span>
+                <h4 className="font-serif text-lg font-bold text-forest-950 mb-2">{t.steps.s4Title}</h4>
+                <p className="text-xs text-earth-700 leading-relaxed">{t.steps.s4Desc}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* SPLIT BENEFITS SECTION */}
+          <section id="benefits" className="py-20 bg-earth-50 border-t border-earth-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {/* For Farmers */}
+                <div className="bg-[#FAF7F2] p-8 sm:p-10 rounded-3xl border border-forest-200 shadow-sm">
+                  <span className="text-xs uppercase font-bold text-forest-700 tracking-wider">GROWER ADVANTAGE</span>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 mt-1 mb-2">{t.benefits.farmersTitle}</h3>
+                  <p className="text-xs text-earth-700 mb-6">{t.benefits.farmersSubtitle}</p>
+                  <ul className="space-y-4 text-xs text-earth-800">
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.f1}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.f2}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.f3}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-forest-100 text-forest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.f4}</span>
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={() => onNavigate('farmer')}
+                    className="mt-8 px-5 py-2.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-semibold text-xs transition"
+                  >
+                    Open Farmer Portal &rarr;
+                  </button>
+                </div>
+
+                {/* For Restaurants */}
+                <div className="bg-[#FAF7F2] p-8 sm:p-10 rounded-3xl border border-harvest-200 shadow-sm">
+                  <span className="text-xs uppercase font-bold text-harvest-700 tracking-wider">CHEF ADVANTAGE</span>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-forest-950 mt-1 mb-2">{t.benefits.restaurantsTitle}</h3>
+                  <p className="text-xs text-earth-700 mb-6">{t.benefits.restaurantsSubtitle}</p>
+                  <ul className="space-y-4 text-xs text-earth-800">
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-harvest-100 text-harvest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.r1}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-harvest-100 text-harvest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.r2}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-harvest-100 text-harvest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.r3}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-harvest-100 text-harvest-800 font-bold flex items-center justify-center shrink-0">+</span>
+                      <span>{t.benefits.r4}</span>
+                    </li>
+                  </ul>
+                  <button 
+                    onClick={() => onNavigate('restaurant')}
+                    className="mt-8 px-5 py-2.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-semibold text-xs transition"
+                  >
+                    Open Restaurant Portal &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* TRUST SECTION */}
+          <section className="py-20 bg-forest-900 text-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <span className="text-xs font-bold uppercase tracking-widest text-harvest-400 block mb-3">VERIFIED FIELD PERFORMANCE</span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-earth-50 mb-8">{t.trust.title}</h2>
+              <blockquote className="font-serif text-lg sm:text-xl italic text-earth-100 max-w-3xl mx-auto leading-relaxed mb-6">
+                &ldquo;{t.trust.quote}&rdquo;
+              </blockquote>
+              <div className="font-sans">
+                <div className="font-bold text-harvest-300 text-sm">{t.trust.author}</div>
+                <div className="text-xs text-earth-300">{t.trust.role}</div>
+              </div>
+            </div>
+          </section>
+
+          {/* FINAL CTA BANNER */}
+          <section className="py-20 bg-harvest-50 border-t border-earth-200 text-center">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-forest-950">{t.ctaBanner.title}</h2>
+              <p className="text-sm sm:text-base text-earth-700 max-w-2xl mx-auto leading-relaxed">{t.ctaBanner.desc}</p>
+              <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+                <button 
+                  onClick={() => onNavigate('restaurant')}
+                  className="px-6 py-3 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs shadow-md transition"
+                >
+                  {t.ctaBanner.btnRest}
+                </button>
+                <button 
+                  onClick={() => onNavigate('farmer')}
+                  className="px-6 py-3 rounded-xl bg-earth-200 hover:bg-earth-300 text-forest-950 font-bold text-xs shadow-sm transition"
+                >
+                  {t.ctaBanner.btnFarm}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // SIGN IN MODAL (DEMO CREDENTIALS PRE-FILLED)
+    // =========================================================================
+    function SignInModal({ role, t, onClose, onSuccess }) {
+      const [name, setName] = useState("");
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+      const [error, setError] = useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const validEmail = /^\S+@\S+\.\S+$/.test(email.trim());
+        if (!name.trim() || !validEmail || !password) {
+          setError(t.nav.signInError);
+          return;
+        }
+        onSuccess({ name: name.trim(), email: email.trim().toLowerCase() });
+      };
+
+      const inputCls = "mt-1 w-full px-3 py-2 rounded-lg border border-earth-300 bg-white text-sm";
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
+          <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="w-full max-w-sm bg-[#FAF7F2] rounded-2xl border border-earth-300 shadow-xl p-6 space-y-4">
+            <h2 className="font-serif text-2xl font-bold text-forest-950">
+              {role === 'restaurant' ? t.nav.signInRestaurant : t.nav.signInFarmer}
+            </h2>
+            <p className="text-xs text-earth-600">{t.nav.demoNote}</p>
+            <label className="block text-xs font-semibold text-forest-900">
+              {t.nav.nameLabel}
+              <input type="text" autoFocus autoComplete="name" value={name} placeholder={t.nav.namePlaceholder} onChange={(e) => { setName(e.target.value); setError(""); }} className={inputCls} />
+            </label>
+            <label className="block text-xs font-semibold text-forest-900">
+              {t.nav.email}
+              <input type="email" autoComplete="email" value={email} placeholder={t.nav.emailPlaceholder} onChange={(e) => { setEmail(e.target.value); setError(""); }} className={inputCls} />
+            </label>
+            <label className="block text-xs font-semibold text-forest-900">
+              {t.nav.password}
+              <input type="password" autoComplete="current-password" value={password} placeholder={t.nav.passwordPlaceholder} onChange={(e) => { setPassword(e.target.value); setError(""); }} className={inputCls} />
+            </label>
+            {error && <p className="text-xs text-red-700">{error}</p>}
+            <div className="flex gap-3 pt-1">
+              <button type="submit" className="flex-1 px-4 py-2.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-earth-50 text-xs font-bold">{t.nav.signInBtn}</button>
+              <button type="button" onClick={onClose} className="px-4 py-2.5 rounded-lg border border-earth-300 text-xs font-semibold">{t.nav.cancel}</button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // RESTAURANT DASHBOARD VIEW (DEDICATED NOTIFICATIONS & SIMPLIFIED REDUNDANCY)
+    // =========================================================================
+    function RestaurantDashboardView({
+      user,
+      activeTab,
+      setActiveTab,
+      produceList,
+      cart,
+      addToCart,
+      updateCartQty,
+      removeFromCart,
+      cartTotal,
+      matchingPreview,
+      useRedundancy,
+      setUseRedundancy,
+      orderTimeSlot,
+      setOrderTimeSlot,
+      orderDeliveryDate,
+      setOrderDeliveryDate,
+      orders,
+      recurringOrders,
+      setRecurringOrders,
+      notifications,
+      setNotifications,
+      onOpenCheckout,
+      onAdvanceStatus,
+      onSimulateShortfall
+    }) {
+      const [categoryFilter, setCategoryFilter] = useState("All");
+      const [searchTerm, setSearchTerm] = useState("");
+      const [reviewModalOpen, setReviewModalOpen] = useState(false);
+      const [reviewedFarmer, setReviewedFarmer] = useState("");
+
+      const filteredProduce = produceList.filter(p => {
+        const matchesCat = categoryFilter === "All" || p.category.toLowerCase() === categoryFilter.toLowerCase();
+        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCat && matchesSearch;
+      });
+
+      const unreadNotifCount = notifications.filter(n => !n.read).length;
+
+      return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          {/* HEADER BAR */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-earth-300">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-forest-700">Kitchen Operations</span>
+                <span className="px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 text-[10px] font-bold">Active Buyer</span>
+              </div>
+              <h2 className="font-serif text-3xl font-bold text-forest-950 mt-0.5">Welcome, {user.name}</h2>
+              <p className="text-xs text-earth-600">{user.organization} • {user.email}</p>
+            </div>
+
+            {/* DASHBOARD SUB-NAV TABS */}
+            <div className="flex flex-wrap items-center gap-2 bg-earth-200/60 p-1.5 rounded-xl border border-earth-300">
+              <button 
+                onClick={() => setActiveTab("order")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'order' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Catalog & Order
+              </button>
+              <button 
+                onClick={() => setActiveTab("tracker")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'tracker' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Order Tracker ({orders.filter(o => o.status !== 'delivered').length})
+              </button>
+              <button 
+                onClick={() => setActiveTab("recurring")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'recurring' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Standing Orders
+              </button>
+              <button 
+                onClick={() => setActiveTab("invoices")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'invoices' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Invoices & Splits
+              </button>
+              <button 
+                onClick={() => setActiveTab("notifications")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition relative ${activeTab === 'notifications' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Notifications
+                {unreadNotifCount > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.2 bg-amber-600 text-white rounded-full text-[10px] font-bold">
+                    {unreadNotifCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* TAB 1: PLACE ORDER & LOCAL FARM PRICE COMPARISON */}
+          {activeTab === 'order' && (
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* PRODUCE LISTINGS */}
+              <div className="lg:col-span-8 space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                    {["All", "Vine Produce", "Leafy Greens", "Root Vegetables", "Herbs & Seasoning"].map(cat => (
+                      <button 
+                        key={cat}
+                        onClick={() => setCategoryFilter(cat)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${categoryFilter === cat ? 'bg-forest-800 text-white' : 'bg-white text-earth-700 border border-earth-300 hover:bg-earth-100'}`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Search regional harvest..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-3 py-1.5 text-xs rounded-lg border border-earth-300 bg-white focus:outline-none focus:ring-2 focus:ring-forest-600 w-48"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  {filteredProduce.map(item => (
+                    <div key={item.id} className="bg-white rounded-2xl border border-earth-200 p-5 shadow-sm">
+                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                        <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-cover rounded-xl shrink-0" />
+                        <div className="flex-1 w-full">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <span className="text-[10px] uppercase font-bold text-forest-700">{item.category}</span>
+                              <h4 className="font-serif text-lg font-bold text-forest-950">{item.name}</h4>
+                              <p className="text-xs text-earth-600 mt-0.5">{item.description}</p>
+                            </div>
+                            <button 
+                              onClick={() => addToCart(item)}
+                              className="px-3.5 py-1.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-bold shadow transition shrink-0"
+                            >
+                              + Add to Order
+                            </button>
+                          </div>
+
+                          {/* Nearby Farmer Availability Matrix */}
+                          <div className="mt-3.5 pt-3 border-t border-earth-200">
+                            <span className="text-[11px] font-bold text-forest-800 uppercase tracking-wide block mb-1.5">
+                              Nearby Farm Pricing & Availability:
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                              {item.farmPrices.map((fp, i) => (
+                                <div key={i} className="p-2.5 rounded-lg bg-earth-50 border border-earth-200 text-xs flex flex-col justify-between">
+                                  <div>
+                                    <div className="font-bold text-forest-900 truncate">{fp.farmName}</div>
+                                    <div className="text-[10px] text-earth-500">{fp.distance} • {fp.harvestReady}</div>
+                                  </div>
+                                  <div className="mt-2 flex items-center justify-between">
+                                    <span className="font-serif font-bold text-forest-900 text-sm">₹{fp.price.toFixed(2)} <span className="text-[10px] font-normal text-earth-500">/{item.unit}</span></span>
+                                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">{fp.stock} {item.unit} available</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ORDER CART & SIMPLIFIED REDUNDANCY ALLOCATION */}
+              <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white rounded-2xl border border-earth-300 p-6 shadow-md sticky top-28">
+                  <div className="flex items-center justify-between pb-3 border-b border-earth-200">
+                    <h3 className="font-serif text-lg font-bold text-forest-950">Active Cart</h3>
+                    <span className="text-xs font-semibold text-earth-600">{cart.length} produce types</span>
+                  </div>
+
+                  {cart.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-earth-500">
+                      Your order manifest is empty.<br />Select produce from regional growers.
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-3">
+                      {cart.map(item => (
+                        <div key={item.produceId} className="flex items-center justify-between text-xs pb-2 border-b border-earth-100">
+                          <div>
+                            <div className="font-bold text-forest-900 truncate max-w-[150px]">{item.name}</div>
+                            <div className="text-[10px] text-earth-500">₹{item.price.toFixed(2)} / {item.unit}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => updateCartQty(item.produceId, -5)} className="w-5 h-5 rounded bg-earth-200 text-earth-800 font-bold flex items-center justify-center">-</button>
+                            <span className="font-bold w-12 text-center">{item.qty} {item.unit}</span>
+                            <button onClick={() => updateCartQty(item.produceId, 5)} className="w-5 h-5 rounded bg-earth-200 text-earth-800 font-bold flex items-center justify-center">+</button>
+                            <button onClick={() => removeFromCart(item.produceId)} className="text-red-500 hover:text-red-700 ml-1 font-bold">x</button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Scheduling slots */}
+                      <div className="pt-3 space-y-2">
+                        <div>
+                          <label className="text-[11px] font-bold text-earth-700 block">Delivery Date</label>
+                          <select 
+                            value={orderDeliveryDate} 
+                            onChange={e => setOrderDeliveryDate(e.target.value)}
+                            className="w-full text-xs p-2 rounded-lg border border-earth-300 bg-earth-50 focus:outline-none"
+                          >
+                            <option value="Today (Morning Rush)">Today (Morning Rush)</option>
+                            <option value="Tomorrow">Tomorrow Morning</option>
+                            <option value="Friday Prep">Friday Morning Prep</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-earth-700 block">Kitchen Receiving Window</label>
+                          <select 
+                            value={orderTimeSlot} 
+                            onChange={e => setOrderTimeSlot(e.target.value)}
+                            className="w-full text-xs p-2 rounded-lg border border-earth-300 bg-earth-50 focus:outline-none"
+                          >
+                            <option value="09:00 AM - 11:00 AM (Early Shift)">09:00 AM - 11:00 AM (Early Shift)</option>
+                            <option value="11:00 AM - 1:00 PM (Lunch Prep Window)">11:00 AM - 1:00 PM (Lunch Prep Window)</option>
+                            <option value="03:00 PM - 05:00 PM (Dinner Prep)">03:00 PM - 05:00 PM (Dinner Prep)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* SUPPLY REDUNDANCY PLAN: USER'S CHOICE */}
+                      {matchingPreview && (
+                        <div className="mt-4 p-4 rounded-xl bg-forest-50 border border-forest-200 text-xs space-y-3">
+                          <div className="flex items-center justify-between font-bold text-forest-900 border-b border-forest-200 pb-2">
+                            <span>Supply Redundancy Plan</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${useRedundancy ? 'bg-forest-200 text-forest-900' : 'bg-earth-200 text-earth-700'}`}>
+                              {useRedundancy ? 'Guaranteed Coverage' : 'Not Selected'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Supply Redundancy Plan choice">
+                            <button
+                              type="button"
+                              role="radio"
+                              aria-checked={!useRedundancy}
+                              onClick={() => setUseRedundancy(false)}
+                              className={`p-2.5 rounded-lg border text-left transition ${!useRedundancy ? 'bg-forest-800 text-white border-forest-900' : 'bg-white text-forest-900 border-forest-200 hover:bg-forest-100'}`}
+                            >
+                              <div className="font-bold text-[11px]">Standard</div>
+                              <div className="text-[10px] opacity-80">Single farm, no backup</div>
+                            </button>
+                            <button
+                              type="button"
+                              role="radio"
+                              aria-checked={useRedundancy}
+                              onClick={() => setUseRedundancy(true)}
+                              className={`p-2.5 rounded-lg border text-left transition ${useRedundancy ? 'bg-forest-800 text-white border-forest-900' : 'bg-white text-forest-900 border-forest-200 hover:bg-forest-100'}`}
+                            >
+                              <div className="font-bold text-[11px]">Redundancy Plan</div>
+                              <div className="text-[10px] opacity-80">2 farms + standby reserve</div>
+                            </button>
+                          </div>
+
+                          <div className="space-y-2 text-[11px]">
+                            {/* Primary Supplier */}
+                            <div className="p-2 bg-white rounded-lg border border-forest-200">
+                              <div className="flex justify-between font-semibold text-forest-950">
+                                <span>Primary: {matchingPreview.primaryFarm.name}</span>
+                                <span>{matchingPreview.primaryFarm.sharePercent}</span>
+                              </div>
+                              <div className="text-[10px] text-earth-600 mt-0.5">
+                                {matchingPreview.primaryFarm.allocatedQty} • {matchingPreview.primaryFarm.distance}
+                              </div>
+                            </div>
+
+                            {matchingPreview.redundant ? (
+                              <>
+                                {/* Secondary Supplier */}
+                                <div className="p-2 bg-white rounded-lg border border-forest-200">
+                                  <div className="flex justify-between font-semibold text-forest-950">
+                                    <span>Secondary: {matchingPreview.secondaryFarm.name}</span>
+                                    <span>{matchingPreview.secondaryFarm.sharePercent}</span>
+                                  </div>
+                                  <div className="text-[10px] text-earth-600 mt-0.5">
+                                    {matchingPreview.secondaryFarm.allocatedQty} • {matchingPreview.secondaryFarm.distance}
+                                  </div>
+                                </div>
+
+                                {/* Standby Reserve Buffer */}
+                                <div className="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[10px] text-amber-900">
+                                  <div className="font-bold">Standby Buffer: {matchingPreview.standbyFarm.name}</div>
+                                  <div>{matchingPreview.standbyFarm.status}</div>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="p-2 bg-amber-50 rounded-lg border border-amber-200 text-[10px] text-amber-900">
+                                No backup farm. If the farm has a shortfall, your order may be delayed or reduced. Choose the Redundancy Plan to add a second farm and a standby reserve.
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="text-[10px] text-forest-700 pt-1 border-t border-forest-200">
+                            Route: {matchingPreview.routeSummary}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Total & Checkout */}
+                      <div className="pt-4 border-t border-earth-200 space-y-3">
+                        <div className="flex justify-between items-baseline">
+                          <span className="text-xs text-earth-600">Total Amount:</span>
+                          <span className="font-serif text-xl font-bold text-forest-950">₹{cartTotal.toFixed(2)}</span>
+                        </div>
+                        <button 
+                          onClick={onOpenCheckout}
+                          className="w-full py-3 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs shadow-md transition"
+                        >
+                          Confirm & Authorize Order &rarr;
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: LIVE ORDER TRACKER (INCLUDES LIVE NETWORK DISPATCH) */}
+          {activeTab === 'tracker' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-forest-950">Live Network Dispatch & Order Status</h3>
+                    <p className="text-xs text-earth-600">Monitor multi-farm morning harvest, consolidated route transit, and backup coverage.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  {orders.length === 0 && (
+                    <div className="py-10 text-center text-xs text-earth-500">No orders yet. Place your first order from the Order tab.</div>
+                  )}
+                  {orders.map(order => (
+                    <div key={order.id} className="p-6 rounded-2xl bg-earth-50 border border-earth-300 space-y-5">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif font-bold text-lg text-forest-950">Order #{order.id}</span>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800' : 'bg-harvest-100 text-harvest-800'}`}>
+                              {order.status.replace('_', ' ')}
+                            </span>
+                          </div>
+                          <p className="text-xs text-earth-600">Delivery: {order.deliveryDate} • Slot: {order.deliveryTimeSlot}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {order.stepIndex < 4 && (
+                            <button 
+                              onClick={() => onAdvanceStatus(order.id)}
+                              className="px-3 py-1.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-semibold shadow-sm transition"
+                            >
+                              Advance Status &rarr;
+                            </button>
+                          )}
+                          {order.redundancyEnabled && (
+                            <button 
+                              onClick={() => onSimulateShortfall(order.id, order.contributingFarmers[0]?.farmName || "Primary Farm")}
+                              className="px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold shadow-sm transition"
+                              title="Simulate automated backup farm failover"
+                            >
+                              Simulate Shortfall Failover
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 4-Step Progress Bar */}
+                      <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div className={`p-2.5 rounded-xl border ${order.stepIndex >= 1 ? 'bg-forest-800 text-white border-forest-900' : 'bg-white text-earth-400 border-earth-200'}`}>
+                          <div className="font-bold">1. Confirmed</div>
+                          <div className="text-[10px] opacity-80">Matched to farms</div>
+                        </div>
+                        <div className={`p-2.5 rounded-xl border ${order.stepIndex >= 2 ? 'bg-forest-800 text-white border-forest-900' : 'bg-white text-earth-400 border-earth-200'}`}>
+                          <div className="font-bold">2. Harvesting</div>
+                          <div className="text-[10px] opacity-80">Dawn harvest</div>
+                        </div>
+                        <div className={`p-2.5 rounded-xl border ${order.stepIndex >= 3 ? 'bg-forest-800 text-white border-forest-900' : 'bg-white text-earth-400 border-earth-200'}`}>
+                          <div className="font-bold">3. In Transit</div>
+                          <div className="text-[10px] opacity-80">Consolidated van</div>
+                        </div>
+                        <div className={`p-2.5 rounded-xl border ${order.stepIndex >= 4 ? 'bg-emerald-700 text-white border-emerald-800' : 'bg-white text-earth-400 border-earth-200'}`}>
+                          <div className="font-bold">4. Delivered</div>
+                          <div className="text-[10px] opacity-80">Kitchen received</div>
+                        </div>
+                      </div>
+
+                      {/* Contributing Farmers & Route Breakdown */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="bg-white p-4 rounded-xl border border-earth-200 text-xs">
+                          <span className="font-bold text-forest-900 block mb-2">Contributing Local Farmers:</span>
+                          <div className="space-y-2">
+                            {order.contributingFarmers?.map((f, idx) => (
+                              <div key={idx} className="flex justify-between items-center pb-1 border-b border-earth-100">
+                                <div>
+                                  <span className="font-semibold text-forest-800">{f.farmName}</span>
+                                  <div className="text-[10px] text-earth-500">{f.items}</div>
+                                </div>
+                                <span className="font-mono font-bold text-earth-800">₹{f.amount.toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-white p-4 rounded-xl border border-earth-200 text-xs">
+                          <span className="font-bold text-forest-900 block mb-2">Live Route Manifest:</span>
+                          <p className="text-earth-700 leading-relaxed mb-2">{order.routeOptimization}</p>
+                          <div className="p-2 rounded bg-forest-50 text-forest-800 text-[11px] font-semibold">
+                            {order.redundancyLevel}
+                          </div>
+                          {order.status === 'delivered' && (
+                            <button 
+                              onClick={() => { setReviewedFarmer(order.contributingFarmers[0]?.farmName || "Farm"); setReviewModalOpen(true); }}
+                              className="mt-3 px-3 py-1.5 rounded-lg bg-harvest-500 hover:bg-harvest-600 text-forest-950 font-bold text-xs transition"
+                            >
+                              Rate & Review Farmers
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: STANDING ORDERS */}
+          {activeTab === 'recurring' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-forest-950">Standing & Recurring Orders</h3>
+                    <p className="text-xs text-earth-600">Automate weekly kitchen pantry supply with guaranteed multi-farm coverage.</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const newRec = {
+                        id: `REC-${Math.floor(100 + Math.random() * 900)}`,
+                        title: "Daily Coriander & Mint Herb Drop",
+                        frequency: "Daily (Mon-Fri)",
+                        items: "Fresh Coriander (5 kg), Fresh Mint (3 kg)",
+                        active: true,
+                        nextDate: "Tomorrow Morning"
+                      };
+                      setRecurringOrders(prev => [newRec, ...prev]);
+                    }}
+                    className="px-3.5 py-2 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-bold transition"
+                  >
+                    + New Standing Schedule
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {recurringOrders.length === 0 && (
+                    <div className="py-8 text-center text-xs text-earth-500">No standing schedules yet.</div>
+                  )}
+                  {recurringOrders.map(rec => (
+                    <div key={rec.id} className="p-4 rounded-xl bg-earth-50 border border-earth-200 flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-forest-950 text-sm">{rec.title}</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">Active</span>
+                        </div>
+                        <div className="text-xs text-earth-600 mt-0.5">{rec.frequency} • Next: {rec.nextDate}</div>
+                        <div className="text-xs text-forest-800 mt-1 font-medium">{rec.items}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="px-3 py-1.5 rounded-lg border border-earth-300 text-xs hover:bg-earth-200 text-earth-800 font-medium">Edit Schedule</button>
+                        <button className="px-3 py-1.5 rounded-lg bg-forest-800 text-white text-xs font-semibold">Trigger Replenishment</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: INVOICES */}
+          {activeTab === 'invoices' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <h3 className="font-serif text-xl font-bold text-forest-950 mb-1">Itemized Invoices & Traceability</h3>
+                <p className="text-xs text-earth-600 mb-6">Complete billing transparency showing net payouts disbursed to each contributing farm.</p>
+
+                <div className="space-y-4">
+                  {orders.length === 0 && (
+                    <div className="py-8 text-center text-xs text-earth-500">No invoices yet.</div>
+                  )}
+                  {orders.map(order => (
+                    <div key={order.id} className="p-5 rounded-xl border border-earth-200 bg-earth-50">
+                      <div className="flex flex-wrap items-center justify-between pb-3 border-b border-earth-200 gap-2">
+                        <div>
+                          <span className="font-serif font-bold text-base text-forest-950">Invoice #INV-{order.id.replace('ORD-', '')}</span>
+                          <span className="text-xs text-earth-600 ml-2">For {order.deliveryDate}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                            Direct Settlement Paid
+                          </span>
+                          <span className="font-serif text-base font-bold text-forest-950">₹{order.totalAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3">
+                        <span className="text-[11px] font-bold text-earth-700 uppercase tracking-wide block mb-2">Itemized Farm Payouts:</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {order.contributingFarmers?.map((f, i) => (
+                            <div key={i} className="p-3 bg-white rounded-lg border border-earth-200 text-xs">
+                              <div className="font-bold text-forest-900">{f.farmName}</div>
+                              <div className="text-earth-600 text-[11px] my-1">{f.items}</div>
+                              <div className="flex justify-between items-center pt-1 border-t border-earth-100 font-mono font-semibold">
+                                <span className="text-earth-500">Net Disbursed:</span>
+                                <span>₹{f.amount.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: DEDICATED RESTAURANT NOTIFICATIONS */}
+          {activeTab === 'notifications' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <div className="flex items-center justify-between pb-4 border-b border-earth-200">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-forest-950">Kitchen Dispatch Alerts</h3>
+                    <p className="text-xs text-earth-600">Real-time status updates from contributing regional farms and transit vehicles.</p>
+                  </div>
+                  <button 
+                    onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
+                    className="text-xs font-semibold text-forest-800 hover:text-forest-950"
+                  >
+                    Mark All as Read
+                  </button>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {notifications.map(n => (
+                    <div key={n.id} className={`p-4 rounded-xl border transition ${n.read ? 'bg-earth-50/60 border-earth-200' : 'bg-white border-forest-300 shadow-sm'}`}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-bold text-forest-900">{n.title}</span>
+                        <span className="text-earth-500 text-[11px]">{n.time}</span>
+                      </div>
+                      <p className="text-xs text-earth-700 leading-relaxed">{n.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* REVIEW MODAL */}
+          {reviewModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-[#FAF7F2] max-w-md w-full rounded-2xl p-6 shadow-2xl border border-earth-300">
+                <div className="flex items-center justify-between pb-3 border-b border-earth-200">
+                  <h4 className="font-serif text-lg font-bold text-forest-950">Rate & Review Farm Produce</h4>
+                  <button onClick={() => setReviewModalOpen(false)} className="text-earth-500 text-xl font-bold">&times;</button>
+                </div>
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-earth-800 block mb-1">Farmer: {reviewedFarmer}</label>
+                    <div className="text-xs text-forest-800 font-semibold">Quality Rating: 5 / 5 Stars</div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-earth-800 block mb-1">Chef Feedback</label>
+                    <textarea 
+                      rows="3" 
+                      defaultValue="Pristine dew-fresh produce. Leaves crisp, uniform grading, zero transit damage." 
+                      className="w-full text-xs p-3 rounded-lg border border-earth-300 bg-white focus:outline-none"
+                    ></textarea>
+                  </div>
+                  <button 
+                    onClick={() => { alert("Feedback recorded. Farm reliability score updated."); setReviewModalOpen(false); }}
+                    className="w-full py-2.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs"
+                  >
+                    Submit Review &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // FARMER DASHBOARD VIEW (WORKING PHOTO UPLOAD WITH FILTER/CROP & EDIT STOCK)
+    // =========================================================================
+    function FarmerDashboardView({
+      user,
+      activeTab,
+      setActiveTab,
+      orders,
+      produceList,
+      notifications,
+      setNotifications,
+      onAddProduce,
+      onEditStockItem,
+      onAdvanceStatus
+    }) {
+      const [newItemName, setNewItemName] = useState("");
+      const [newItemCategory, setNewItemCategory] = useState("Vine Produce");
+      const [newItemPrice, setNewItemPrice] = useState("");
+      const [newItemStock, setNewItemStock] = useState("");
+      const [newItemUnit, setNewItemUnit] = useState("kg");
+
+      // Photo upload state with filter & crop
+      const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState(null);
+      const [photoFilter, setPhotoFilter] = useState("none"); // 'none' | 'vibrant' | 'warm' | 'crisp'
+      const [cropAspect, setCropAspect] = useState("square"); // 'square' | 'landscape'
+
+      const myListings = produceList.filter(p => p.farmPrices.some(fp => fp.farmerId === user.id));
+      const myOrders = orders.filter(o => o.contributingFarmers?.some(cf => cf.farmName === user.organization || cf.farmerId === user.id));
+
+      const handlePhotoSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            setUploadedPhotoUrl(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const handleAddCrop = (e) => {
+        e.preventDefault();
+        if (!newItemName || !newItemPrice || !newItemStock) return;
+
+        const fallbackUrl = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80";
+        const finalPhotoUrl = uploadedPhotoUrl || fallbackUrl;
+
+        const newCrop = {
+          id: `prod_${Date.now()}`,
+          name: newItemName,
+          category: newItemCategory,
+          unit: newItemUnit,
+          description: "Freshly cultivated regional harvest at peak ripeness.",
+          imageUrl: finalPhotoUrl,
+          farmPrices: [
+            {
+              farmerId: user.id,
+              farmName: user.organization,
+              price: Number(newItemPrice),
+              stock: Number(newItemStock),
+              harvestReady: "Ready for Harvest",
+              distance: "12 km"
+            }
+          ]
+        };
+
+        onAddProduce(newCrop);
+        setNewItemName("");
+        setNewItemPrice("");
+        setNewItemStock("");
+        setUploadedPhotoUrl(null);
+        alert(`Successfully listed ${newCrop.name} in regional network marketplace!`);
+      };
+
+      const unreadCount = notifications.filter(n => !n.read).length;
+
+      return (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+          {/* HEADER BAR */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-earth-300">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-forest-700">Grower Operations</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Certified Organic Cluster</span>
+              </div>
+              <h2 className="font-serif text-3xl font-bold text-forest-950 mt-0.5">Welcome, {user.name}</h2>
+              <p className="text-xs text-earth-600">{user.organization} • {user.email}</p>
+            </div>
+
+            {/* FARMER SUB-NAV */}
+            <div className="flex flex-wrap items-center gap-2 bg-earth-200/60 p-1.5 rounded-xl border border-earth-300">
+              <button 
+                onClick={() => setActiveTab("inventory")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'inventory' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Crop Inventory
+              </button>
+              <button 
+                onClick={() => setActiveTab("requests")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'requests' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Matched Requests ({myOrders.length})
+              </button>
+              <button 
+                onClick={() => setActiveTab("calendar")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'calendar' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Delivery Calendar
+              </button>
+              <button 
+                onClick={() => setActiveTab("earnings")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === 'earnings' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Earnings & Direct Payouts
+              </button>
+              <button 
+                onClick={() => setActiveTab("notifications")} 
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition relative ${activeTab === 'notifications' ? 'bg-forest-800 text-white shadow-sm' : 'text-forest-900 hover:bg-earth-300/50'}`}
+              >
+                Notifications
+                {unreadCount > 0 && (
+                  <span className="ml-1.5 px-1.5 py-0.2 bg-amber-600 text-white rounded-full text-[10px] font-bold">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* TAB 1: CROP INVENTORY & WORKING PHOTO UPLOAD WITH FILTER/CROP */}
+          {activeTab === 'inventory' && (
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* LISTINGS TABLE */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                  <h3 className="font-serif text-xl font-bold text-forest-950 mb-1">Active Harvest Listings</h3>
+                  <p className="text-xs text-earth-600 mb-6">Manage available quantity, update prices, or edit availability status.</p>
+
+                  <div className="space-y-4">
+                    {myListings.length === 0 && (
+                      <div className="py-8 text-center text-xs text-earth-500">You have not listed any crops yet. Add your first harvest listing.</div>
+                    )}
+                    {myListings.map(item => {
+                      const myPrice = item.farmPrices.find(fp => fp.farmerId === user.id);
+                      return (
+                        <div key={item.id} className="p-4 rounded-xl border border-earth-200 bg-earth-50 flex flex-wrap items-center justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <img src={item.imageUrl} alt={item.name} className="w-14 h-14 rounded-lg object-cover" />
+                            <div>
+                              <div className="font-bold text-forest-900 text-sm">{item.name}</div>
+                              <div className="text-xs text-earth-600">{item.category} • {item.unit}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <span className="font-bold text-forest-900 text-sm">₹{myPrice.price.toFixed(2)}</span>
+                              <span className="text-[10px] text-earth-500 block">/{item.unit}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-bold text-emerald-700 text-xs">{myPrice.stock} {item.unit}</span>
+                              <span className="text-[10px] text-earth-500 block">available</span>
+                            </div>
+                            <button 
+                              onClick={() => onEditStockItem(item)}
+                              className="px-3 py-1.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-semibold shadow-sm transition"
+                            >
+                              Edit Stock
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* LIST NEW HARVEST WITH PHOTO UPLOAD & FILTER/CROP */}
+              <div className="lg:col-span-5">
+                <div className="bg-white rounded-2xl border border-earth-300 p-6 shadow-md">
+                  <h3 className="font-serif text-lg font-bold text-forest-950 mb-1">List New Harvest</h3>
+                  <p className="text-xs text-earth-600 mb-4">Post freshly harvested crops directly into the restaurant procurement pool.</p>
+                  
+                  <form onSubmit={handleAddCrop} className="space-y-3">
+                    <div>
+                      <label className="text-xs font-bold text-earth-800 block mb-1">Produce Name</label>
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="e.g. Desi Methi / Fenugreek Leaves" 
+                        value={newItemName}
+                        onChange={e => setNewItemName(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-earth-50"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-earth-800 block mb-1">Category</label>
+                      <select 
+                        value={newItemCategory}
+                        onChange={e => setNewItemCategory(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-earth-50"
+                      >
+                        <option value="Vine Produce">Vine Produce</option>
+                        <option value="Leafy Greens">Leafy Greens</option>
+                        <option value="Root Vegetables">Root Vegetables</option>
+                        <option value="Herbs & Seasoning">Herbs & Seasoning</option>
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs font-bold text-earth-800 block mb-1">Price (₹)</label>
+                        <input 
+                          type="number" 
+                          step="0.5" 
+                          required 
+                          placeholder="35" 
+                          value={newItemPrice}
+                          onChange={e => setNewItemPrice(e.target.value)}
+                          className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-earth-50"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-earth-800 block mb-1">Unit</label>
+                        <select 
+                          value={newItemUnit} 
+                          onChange={e => setNewItemUnit(e.target.value)}
+                          className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-earth-50"
+                        >
+                          <option value="kg">kg</option>
+                          <option value="crate (20 kg)">crate (20 kg)</option>
+                          <option value="bunch">bunch</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-earth-800 block mb-1">Available Quantity</label>
+                      <input 
+                        type="number" 
+                        required 
+                        placeholder="120" 
+                        value={newItemStock}
+                        onChange={e => setNewItemStock(e.target.value)}
+                        className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-earth-50"
+                      />
+                    </div>
+
+                    {/* PHOTO UPLOAD WITH FILTER & CROP */}
+                    <div className="pt-2 border-t border-earth-200">
+                      <label className="text-xs font-bold text-earth-800 block mb-1">Upload Real Produce Photo</label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handlePhotoSelect}
+                        className="w-full text-xs text-earth-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-forest-100 file:text-forest-800 hover:file:bg-forest-200 cursor-pointer"
+                      />
+
+                      {/* Photo Preview & Filter Options */}
+                      {uploadedPhotoUrl && (
+                        <div className="mt-3 p-3 bg-earth-50 rounded-xl border border-earth-300 space-y-3">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-forest-900">Photo Preview & Styling:</span>
+                            <div className="flex gap-2">
+                              <button 
+                                type="button" 
+                                onClick={() => setCropAspect("square")} 
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${cropAspect === 'square' ? 'bg-forest-800 text-white' : 'bg-earth-200'}`}
+                              >
+                                Square (1:1)
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => setCropAspect("landscape")} 
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${cropAspect === 'landscape' ? 'bg-forest-800 text-white' : 'bg-earth-200'}`}
+                              >
+                                4:3
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className={`overflow-hidden rounded-lg border border-earth-300 w-full ${cropAspect === 'square' ? 'aspect-square' : 'aspect-[4/3]'}`}>
+                            <img 
+                              src={uploadedPhotoUrl} 
+                              alt="Upload preview" 
+                              className="w-full h-full object-cover transition-all"
+                              style={{
+                                filter: photoFilter === 'vibrant' ? 'saturate(1.3) contrast(1.05)' :
+                                        photoFilter === 'warm' ? 'sepia(0.2) saturate(1.2)' :
+                                        photoFilter === 'crisp' ? 'contrast(1.15) brightness(1.02)' : 'none'
+                              }}
+                            />
+                          </div>
+
+                          {/* Filter Presets */}
+                          <div>
+                            <span className="text-[10px] font-bold text-earth-700 block mb-1">Color Filter:</span>
+                            <div className="grid grid-cols-4 gap-1">
+                              {["none", "vibrant", "warm", "crisp"].map(flt => (
+                                <button
+                                  key={flt}
+                                  type="button"
+                                  onClick={() => setPhotoFilter(flt)}
+                                  className={`py-1 rounded text-[10px] capitalize font-medium transition ${photoFilter === flt ? 'bg-forest-800 text-white font-bold' : 'bg-white border border-earth-300 text-earth-800'}`}
+                                >
+                                  {flt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <button type="submit" className="w-full py-2.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs mt-3 shadow transition">
+                      + Add Harvest to Marketplace
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: MATCHED REQUESTS */}
+          {activeTab === 'requests' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <h3 className="font-serif text-xl font-bold text-forest-950 mb-1">Matched Harvest Allocations</h3>
+                <p className="text-xs text-earth-600 mb-6">Order quotas assigned to your farm by the network algorithm.</p>
+
+                <div className="space-y-4">
+                  {myOrders.length === 0 && (
+                    <div className="py-8 text-center text-xs text-earth-500">No matched orders yet.</div>
+                  )}
+                  {myOrders.map(order => {
+                    const myCut = order.contributingFarmers?.find(f => f.farmName === user.organization || f.farmerId === user.id);
+                    return (
+                      <div key={order.id} className="p-5 rounded-2xl bg-earth-50 border border-earth-300">
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-earth-200">
+                          <div>
+                            <span className="font-serif font-bold text-lg text-forest-950">Order #{order.id}</span>
+                            <span className="text-xs text-earth-600 ml-2">Restaurant: <strong>{order.restaurantName}</strong></span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => onAdvanceStatus(order.id)}
+                              className="px-3.5 py-1.5 rounded-lg bg-forest-800 hover:bg-forest-900 text-white text-xs font-bold"
+                            >
+                              Confirm Morning Harvest Complete
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 flex flex-wrap items-center justify-between text-xs gap-3">
+                          <div>
+                            <span className="font-semibold text-forest-800">Your Harvest Quota:</span>
+                            <div className="text-earth-800 font-medium">{myCut?.items}</div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-earth-500 block">Direct Net Payout:</span>
+                            <span className="font-serif font-bold text-lg text-forest-950">₹{(myCut?.amount || 0).toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: CALENDAR */}
+          {activeTab === 'calendar' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <h3 className="font-serif text-xl font-bold text-forest-950 mb-1">Upcoming Harvest Commitments</h3>
+                <p className="text-xs text-earth-600 mb-6">Scheduled pickup windows for the temperature-controlled route vehicles.</p>
+
+                {myOrders.length === 0 ? (
+                  <div className="py-8 text-center text-xs text-earth-500">No upcoming harvest commitments.</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {myOrders.map(order => {
+                      const myCut = order.contributingFarmers?.find(f => f.farmerId === user.id);
+                      return (
+                        <div key={order.id} className="p-4 rounded-xl border border-earth-300 bg-white">
+                          <span className="text-xs font-bold text-earth-700 uppercase block mb-1">{order.deliveryDate}</span>
+                          <h5 className="font-bold text-forest-950 text-sm">Order #{order.id}</h5>
+                          <p className="text-xs text-earth-700 mt-1">{myCut?.items}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: EARNINGS & PAYOUTS */}
+          {activeTab === 'earnings' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between pb-6 border-b border-earth-200 gap-4">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-forest-950 mb-1">Farmer Earnings & Direct Disbursements</h3>
+                    <p className="text-xs text-earth-600">Fair transparent payout: 95% net settlement deposited directly for every harvest fulfilled.</p>
+                  </div>
+                  <div className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    Direct Account Verified
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 my-6">
+                  <div className="p-5 rounded-2xl bg-earth-50 border border-earth-200">
+                    <span className="text-xs text-earth-600 block">Total Revenue Disbursed:</span>
+                    <span className="font-serif text-3xl font-bold text-forest-950">₹{(user.totalEarnings || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="p-5 rounded-2xl bg-earth-50 border border-earth-200">
+                    <span className="text-xs text-earth-600 block">Pending Transit Settlement:</span>
+                    <span className="font-serif text-3xl font-bold text-harvest-700">₹0.00</span>
+                  </div>
+                  <div className="p-5 rounded-2xl bg-earth-50 border border-earth-200">
+                    <span className="text-xs text-earth-600 block">On-Time Fulfillment Rate:</span>
+                    <span className="font-serif text-3xl font-bold text-emerald-700">{user.onTimeRate == null ? "—" : `${user.onTimeRate}%`}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: DEDICATED FARMER NOTIFICATIONS */}
+          {activeTab === 'notifications' && (
+            <div className="mt-8 space-y-6">
+              <div className="bg-white rounded-2xl border border-earth-200 p-6 shadow-sm">
+                <div className="flex items-center justify-between pb-4 border-b border-earth-200">
+                  <div>
+                    <h3 className="font-serif text-xl font-bold text-forest-950">Farmer Harvest & Payout Alerts</h3>
+                    <p className="text-xs text-earth-600">Notifications regarding new order quotas, collection timings, and direct disbursements.</p>
+                  </div>
+                  <button 
+                    onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
+                    className="text-xs font-semibold text-forest-800 hover:text-forest-950"
+                  >
+                    Mark All as Read
+                  </button>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {notifications.map(n => (
+                    <div key={n.id} className={`p-4 rounded-xl border transition ${n.read ? 'bg-earth-50/60 border-earth-200' : 'bg-white border-forest-300 shadow-sm'}`}>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-bold text-forest-900">{n.title}</span>
+                        <span className="text-earth-500 text-[11px]">{n.time}</span>
+                      </div>
+                      <p className="text-xs text-earth-700 leading-relaxed">{n.message}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // EDIT STOCK MODAL (FIX FOR EDIT STOCK BUTTON)
+    // =========================================================================
+    function EditStockModal({ item, onClose, onSave, farmerId }) {
+      const targetIndex = item.farmPrices.findIndex(fp => fp.farmerId === farmerId);
+      const editIndex = targetIndex >= 0 ? targetIndex : 0;
+      const primaryListing = item.farmPrices[editIndex] || {};
+      const [stockQty, setStockQty] = useState(primaryListing.stock || 100);
+      const [unitPrice, setUnitPrice] = useState(primaryListing.price || 35);
+      const [harvestReady, setHarvestReady] = useState(primaryListing.harvestReady || "Ready for Harvest Today");
+
+      const handleSave = (e) => {
+        e.preventDefault();
+        const updatedItem = {
+          ...item,
+          farmPrices: item.farmPrices.map((fp, i) => i === editIndex ? {
+            ...fp,
+            stock: Number(stockQty),
+            price: Number(unitPrice),
+            harvestReady: harvestReady
+          } : fp)
+        };
+        onSave(updatedItem);
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#FAF7F2] max-w-md w-full rounded-2xl p-6 shadow-2xl border border-earth-300">
+            <div className="flex items-center justify-between pb-3 border-b border-earth-200">
+              <h4 className="font-serif text-lg font-bold text-forest-950">Edit Inventory Stock</h4>
+              <button onClick={onClose} className="text-earth-500 text-xl font-bold">&times;</button>
+            </div>
+
+            <form onSubmit={handleSave} className="mt-4 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-earth-800 block mb-1">Produce Name</label>
+                <div className="text-xs font-bold text-forest-900 p-2.5 bg-earth-100 rounded-lg border border-earth-200">
+                  {item.name}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-earth-800 block mb-1">Available Quantity ({item.unit})</label>
+                  <input 
+                    type="number" 
+                    required 
+                    value={stockQty}
+                    onChange={e => setStockQty(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-white focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-earth-800 block mb-1">Unit Price (₹)</label>
+                  <input 
+                    type="number" 
+                    step="0.5" 
+                    required 
+                    value={unitPrice}
+                    onChange={e => setUnitPrice(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-earth-800 block mb-1">Harvest-Ready Status</label>
+                <select 
+                  value={harvestReady}
+                  onChange={e => setHarvestReady(e.target.value)}
+                  className="w-full text-xs p-2.5 rounded-lg border border-earth-300 bg-white focus:outline-none"
+                >
+                  <option value="Ready for Harvest Today">Ready for Harvest Today</option>
+                  <option value="Picked 6 AM Today">Picked 6 AM Today</option>
+                  <option value="Ready Tomorrow Morning">Ready Tomorrow Morning</option>
+                  <option value="Available on Call">Available on Call</option>
+                  <option value="Low Stock (Cut to Order)">Low Stock (Cut to Order)</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={onClose} 
+                  className="w-1/2 py-2.5 rounded-xl border border-earth-300 bg-white text-earth-800 font-semibold text-xs"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="w-1/2 py-2.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs shadow"
+                >
+                  Save Stock Updates
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // =========================================================================
+    // CHECKOUT MODAL
+    // =========================================================================
+    function CheckoutModal({ isOpen, onClose, cartTotal, matchingPreview, onComplete }) {
+      const [isProcessing, setIsProcessing] = useState(false);
+
+      const handleAuthorize = () => {
+        setIsProcessing(true);
+        setTimeout(() => {
+          setIsProcessing(false);
+          onComplete();
+        }, 1000);
+      };
+
+      const platformFee = Math.round(cartTotal * 0.05 * 100) / 100;
+      const netFarmerPool = Math.round((cartTotal - platformFee) * 100) / 100;
+
+      return (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white max-w-lg w-full rounded-3xl p-7 shadow-2xl border border-earth-300">
+            <div className="flex items-center justify-between pb-3 border-b border-earth-200">
+              <h3 className="font-serif text-lg font-bold text-forest-950">Confirm & Authorize Order</h3>
+              <button onClick={onClose} className="text-earth-500 hover:text-earth-900 text-xl font-bold">&times;</button>
+            </div>
+
+            <div className="my-5 space-y-4 text-xs">
+              <div className="p-4 rounded-xl bg-earth-50 border border-earth-200 space-y-2">
+                <div className="flex justify-between font-bold text-forest-950 text-sm">
+                  <span>Total Order Value:</span>
+                  <span>₹{cartTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-earth-600 text-[11px]">
+                  <span>Farmer Cluster Disbursement (95%):</span>
+                  <span>₹{netFarmerPool.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-earth-600 text-[11px]">
+                  <span>Logistics Coordination (5%):</span>
+                  <span>₹{platformFee.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Multi-Farm Split Preview */}
+              {matchingPreview && (
+                <div className="p-3.5 rounded-xl bg-forest-50 border border-forest-200 space-y-1.5">
+                  <span className="font-bold text-forest-900 block text-[11px]">Direct Payout Splitting:</span>
+                  <div className="flex justify-between text-[11px] text-earth-800">
+                    <span>{matchingPreview.primaryFarm.name}</span>
+                    <span className="font-mono font-semibold">₹{(netFarmerPool * (matchingPreview.secondaryFarm ? 0.6 : 1)).toFixed(2)}</span>
+                  </div>
+                  {matchingPreview.secondaryFarm && (
+                    <div className="flex justify-between text-[11px] text-earth-800">
+                      <span>{matchingPreview.secondaryFarm.name}</span>
+                      <span className="font-mono font-semibold">₹{(netFarmerPool * 0.4).toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="p-3 bg-earth-100 rounded-xl text-[11px] text-earth-700">
+                Payment Method: Corporate Kitchen Account / Direct Transfer
+              </div>
+
+              <button 
+                onClick={handleAuthorize}
+                disabled={isProcessing}
+                className="w-full py-3.5 rounded-xl bg-forest-800 hover:bg-forest-900 text-white font-bold text-xs shadow-lg transition mt-4"
+              >
+                {isProcessing ? "Authorizing Order..." : `Confirm & Place Order (₹${cartTotal.toFixed(2)})`}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Render the App
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

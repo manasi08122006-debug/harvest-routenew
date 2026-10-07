@@ -1,0 +1,12 @@
+{
+  "name": "harvest-route-workspace",
+  "version": "1.0.0",
+  "description": "Harvest Route - Farm-to-Kitchen Local Redundant Produce Network",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "node server/server.js",
+    "client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build"
+  }
+}
